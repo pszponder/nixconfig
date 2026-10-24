@@ -1,0 +1,32 @@
+{ self, inputs, ... }: {
+
+  # Define flake part nixosModule "tpx1Hardware" and pass in configuration from /etc/nixos/hardware-configuration.nix
+  flake.nixosModules.tpx1Hardware = { config, lib, pkgs, modulesPath, ... }: {
+
+    # Insert the contents of your original hardware configuration from /etc/nixos/hardware-configuration.nix here
+    imports = [ (modulesPath + "/installer/scan/not-detected.nix")];
+
+    boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" ];
+    boot.initrd.kernelModules = [ ];
+    boot.kernelModules = [ "kvm-intel" ];
+    boot.extraModulePackages = [ ];
+
+    fileSystems."/" =
+      { device = "/dev/disk/by-uuid/f920ccd1-bb4f-49a9-b4b7-899ff8b8c462";
+        fsType = "ext4";
+      };
+
+    fileSystems."/boot" =
+      { device = "/dev/disk/by-uuid/0172-8106";
+        fsType = "vfat";
+        options = [ "fmask=0077" "dmask=0077" ];
+      };
+
+    swapDevices =
+      [ { device = "/dev/disk/by-uuid/1af1bf8e-783a-4ce0-894c-afc033ab2e8d"; }
+      ];
+
+    nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+    hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  };
+}
