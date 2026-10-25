@@ -10,6 +10,8 @@
       self.nixosModules.codex
       self.nixosModules.devenv
       self.nixosModules.direnv
+      self.nixosModules.discord
+      self.nixosModules.docker
       self.nixosModules.fzf
       self.nixosModules.ghostty
       self.nixosModules.git
@@ -20,6 +22,7 @@
       self.nixosModules.kanata
       self.nixosModules.neovim
       self.nixosModules.nerdFonts
+      self.nixosModules.obsidian
       self.nixosModules.shell
       self.nixosModules.ssh
       self.nixosModules.starship
