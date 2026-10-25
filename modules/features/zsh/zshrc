@@ -14,7 +14,6 @@ source @aliases@
 source @functions@
 source @fzfIntegration@
 source <(COMPLETE=zsh jj)
-eval "$(zoxide init zsh)"
 eval "$(direnv hook zsh)"
 eval "$(devenv hook zsh)"
 eval "$(atuin init zsh)"
@@ -22,3 +21,5 @@ eval "$(starship init zsh)"
 source @viModeBindings@
 source @interactive@
 source @zshSyntaxHighlighting@/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# Keep zoxide last so other integrations cannot replace its prompt hook.
+eval "$(zoxide init zsh)"
