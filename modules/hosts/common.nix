@@ -1,4 +1,4 @@
-{ ... }: {
+_: {
   flake.nixosModules.common = {
     # Make the llm-agents binary cache available to devenv and other Nix commands.
     nix.settings = {

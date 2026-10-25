@@ -1,0 +1,22 @@
+# shellcheck disable=SC1090,SC1091
+. @shellEnvironment@
+[[ $- == *i* ]] || return 0
+[[ ! -v __NIXCONFIG_BASHRC ]] || return 0
+__NIXCONFIG_BASHRC=1
+if [ -f /etc/bashrc ]; then . /etc/bashrc; fi
+mkdir -p "$XDG_STATE_HOME/bash"
+HISTFILE="$XDG_STATE_HOME/bash/history"
+HISTSIZE=32768 HISTFILESIZE=32768 HISTCONTROL=ignoreboth:erasedups
+shopt -s histappend cmdhist checkwinsize
+if [[ ! -v BASH_COMPLETION_VERSINFO ]]; then
+	source @bashCompletion@/etc/profile.d/bash_completion.sh
+fi
+source @interactive@
+source @aliases@
+source @functions@
+source @fzfIntegration@
+source <(COMPLETE=bash jj)
+eval "$(zoxide init bash)"
+eval "$(direnv hook bash)"
+eval "$(devenv hook bash)"
+eval "$(starship init bash)"

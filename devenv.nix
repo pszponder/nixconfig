@@ -1,7 +1,13 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   llm = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
+  bashFiles = "\\.(sh|bash)$|^modules/features/(bash/bashrc|shell/(aliases|bash_profile))$|^scripts/bootstrap-(home|ssh)$";
 in
 {
   packages = with pkgs; [
@@ -11,11 +17,45 @@ in
     git
     just
     nixfmt
+    prettier
+    shfmt
+    shellcheck
     statix
+    taplo
     llm.codex
   ];
 
+  git-hooks.excludes = [ "^modules/hosts/tpx1/_hardware-configuration\\.nix$" ];
   git-hooks.hooks = {
+    nixfmt.enable = true;
+    statix = {
+      enable = true;
+      args = [
+        "--ignore"
+        "modules/hosts/tpx1/_hardware-configuration.nix"
+      ];
+    };
+    deadnix.enable = true;
+    prettier = {
+      enable = true;
+      files = "\\.(md|json|ya?ml)$";
+    };
+    taplo.enable = true;
+    shfmt = {
+      enable = true;
+      files = bashFiles;
+      types = lib.mkForce [ "file" ];
+      args = [
+        "-ln"
+        "bash"
+      ];
+    };
+    shellcheck = {
+      enable = true;
+      files = bashFiles;
+      types = lib.mkForce [ "file" ];
+      args = [ "--shell=bash" ];
+    };
     betterleaks-commit = {
       enable = true;
       name = "Betterleaks staged secrets";

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 022
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+while IFS= read -r directory; do
+	[[ -n $directory ]] || continue
+	mkdir -p -- "$HOME/$directory"
+	printf 'Ready: %s\n' "$HOME/$directory"
+done <"$script_dir/../modules/features/home-directories/directories"

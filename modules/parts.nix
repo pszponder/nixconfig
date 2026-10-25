@@ -1,4 +1,7 @@
+{ inputs, ... }:
 {
+  imports = [ inputs.wrappers.flakeModules.wrappers ];
+
   # Define what systems the modules are runnable on.
   # Some pacakges may not have an aarch64 version, consult
   # nixpkgs to check.
@@ -11,4 +14,3 @@
     ];
   };
 }
-

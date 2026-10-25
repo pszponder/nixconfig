@@ -1,7 +1,5 @@
-{ inputs, self, ... }:
+{ self, ... }:
 {
-  imports = [ inputs.wrappers.flakeModules.wrappers ];
-
   # Reusable wrapper; flake-parts also exposes packages.<system>.kanata.
   flake.wrappers.kanata =
     {

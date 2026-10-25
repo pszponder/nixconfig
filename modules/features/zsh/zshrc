@@ -1,0 +1,24 @@
+mkdir -p "$XDG_STATE_HOME/zsh" "$XDG_CACHE_HOME/zsh"
+HISTFILE="$XDG_STATE_HOME/zsh/history"
+HISTSIZE=32768 SAVEHIST=32768
+setopt AUTO_CD NUMERIC_GLOB_SORT HIST_REDUCE_BLANKS HIST_VERIFY
+setopt EXTENDED_HISTORY HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE SHARE_HISTORY
+fpath=(@zshCompletions@/share/zsh/site-functions @nixZshCompletions@/share/zsh/site-functions $fpath)
+source @viModeSettings@
+autoload -Uz compinit
+compinit -d "$XDG_CACHE_HOME/zsh/zcompdump"
+source @zshViMode@/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+source @zshFzfTab@/share/fzf-tab/fzf-tab.plugin.zsh
+source @zshAutosuggestions@/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source @aliases@
+source @functions@
+source @fzfIntegration@
+source <(COMPLETE=zsh jj)
+eval "$(zoxide init zsh)"
+eval "$(direnv hook zsh)"
+eval "$(devenv hook zsh)"
+eval "$(atuin init zsh)"
+eval "$(starship init zsh)"
+source @viModeBindings@
+source @interactive@
+source @zshSyntaxHighlighting@/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

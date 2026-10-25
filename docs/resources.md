@@ -49,6 +49,7 @@
 - [Ultimate NixOS Desktop: Niri, Noctalia Shell, and the Dendritic Pattern | Full Setup](https://www.youtube.com/watch?v=aNgujRXDTdE)
 
 ### Nix Wrapper Modules
+
 - [nix-wrapper-modules](https://github.com/nix-community/nix-wrapper-modules)
 
 ## Quickshell
@@ -58,6 +59,10 @@
 - [Adumh00man - Quickshell is Easy, Actually](https://www.youtube.com/watch?v=sRInj932Ruk)
 - [tonyBTW - How to Install and Configure Quickshell - Part 1](https://www.youtube.com/watch?v=g_I4hwCuDyQ)
 - [tonyBTW - How to Install and Configure Quickshell - Part 2](https://www.youtube.com/watch?v=leCzeCeNxas)
+
+## hjem
+
+- [hjem](https://github.com/feel-co/hjem)
 
 ## 3rd Party Flakes
 

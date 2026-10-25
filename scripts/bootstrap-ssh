@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+
+for command in ssh-keygen hostname; do
+	command -v "$command" >/dev/null || {
+		printf 'Required command missing: %s\n' "$command" >&2
+		exit 1
+	}
+done
+
+keys=("$HOME/.ssh/default" "$HOME/.ssh/github/pszponder/personal")
+
+# Inspect both destinations before creating anything. Never follow key symlinks.
+for key in "${keys[@]}"; do
+	if [[ -L $key || -L "$key.pub" ]]; then
+		printf 'Refusing symlink key files: %s\n' "$key" >&2
+		exit 1
+	fi
+	if [[ -e $key || -e "$key.pub" ]]; then
+		if [[ ! -f $key || ! -f "$key.pub" ]]; then
+			printf 'Incomplete key pair or non-file destination: %s. Inspect it before rerunning.\n' "$key" >&2
+			exit 1
+		fi
+	fi
+done
+
+mkdir -p -- "$HOME/.ssh/github/pszponder"
+chmod 700 -- "$HOME/.ssh" "$HOME/.ssh/github" "$HOME/.ssh/github/pszponder"
+for key in "${keys[@]}"; do
+	if [[ -f $key ]]; then
+		printf 'Keeping existing pair: %s\n' "$key"
+	else
+		printf 'Generating %s; enter a passphrase when prompted.\n' "$key"
+		ssh-keygen -t ed25519 -f "$key" -C "$(basename "$key") from $(hostname)"
+	fi
+	chmod 600 -- "$key"
+	chmod 644 -- "$key.pub"
+	ssh-keygen -lf "$key.pub"
+done
+
+printf '\nRegister this public key in your GitHub account SSH authentication settings:\n  %s\n' "${keys[1]}.pub"
+printf 'Install this public key on servers you access:\n  %s\n' "${keys[0]}.pub"
+printf 'Optional agent caching: ssh-add ~/.ssh/default ~/.ssh/github/pszponder/personal\n'
