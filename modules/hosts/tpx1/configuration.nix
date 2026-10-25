@@ -8,7 +8,7 @@
     # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
     # Define modules to import
-    modules = with self.nixosModules; [
+    imports = with self.nixosModules; [
       tpx1Hardware
     ];
 
