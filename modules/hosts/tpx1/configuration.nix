@@ -16,13 +16,13 @@
       self.nixosModules.ghostty
       self.nixosModules.git
       self.nixosModules.gnome
-      self.nixosModules.hjem
       self.nixosModules.homeDirectories
       self.nixosModules.jujutsu
       self.nixosModules.kanata
       self.nixosModules.neovim
       self.nixosModules.nerdFonts
       self.nixosModules.obsidian
+      self.nixosModules.piotr
       self.nixosModules.shell
       self.nixosModules.ssh
       self.nixosModules.starship
