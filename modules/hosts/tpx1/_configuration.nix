@@ -2,8 +2,12 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
+let
+  # Make unstable packages available to system
+  pkgsUnstable = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+in
 {
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
@@ -93,7 +97,7 @@
 
   # General-purpose packages
   environment.systemPackages = with pkgs; [
-    devenv
+    pkgsUnstable.devenv
     git
     jq
     vim
