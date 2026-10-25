@@ -10,6 +10,7 @@
     # Define modules to import
     imports = with self.nixosModules; [
       tpx1Hardware
+      kanata
     ];
 
   

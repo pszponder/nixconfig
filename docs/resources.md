@@ -33,6 +33,7 @@
 - [Vimjoyer - flake parts wrapped](https://vimjoyer.com/vid79-parts-wrapped/)
 - [Dendritic Nix is the Best Way to Configure a System](https://www.youtube.com/watch?v=buxopFR4VXQ)
 - [Adumh00man - Dendritic nix tutorial series](https://youtube.com/playlist?list=PLWQDi_Uc4miw&si=aiWtoNskmK6UCmOr)
+- [Adumh00man - Dendritic tutorial source](https://git.voidarc.co.uk/adumh00man/dendritic-tutorial)
 - [voidarc/nixos](https://git.voidarc.co.uk/voidarc/nixos)
 - [Context-aware Aspect-oriented Nix | den](https://den.denful.dev/)
 - [Evaluating Den - A Dendritic Configuration Framework · Not A Number](https://not-a-number.io/2026/evaluating-den-a-dendritic-configuration-framework/)
@@ -46,6 +47,9 @@
 - [keenanweaver/nix-config: NixOS config primarily for gaming (mirror)](https://github.com/keenanweaver/nix-config)
 - [Homeless Dotfiles With Nix Wrappers](https://www.youtube.com/watch?v=Zzvn9uYjQJY)
 - [Ultimate NixOS Desktop: Niri, Noctalia Shell, and the Dendritic Pattern | Full Setup](https://www.youtube.com/watch?v=aNgujRXDTdE)
+
+### Nix Wrapper Modules
+- [nix-wrapper-modules](https://github.com/nix-community/nix-wrapper-modules)
 
 ## Quickshell
 
