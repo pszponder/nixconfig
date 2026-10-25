@@ -36,6 +36,7 @@
             "com.mitchellh.ghostty.desktop"
             "code.desktop"
             "dev.zed.Zed.desktop"
+            "obsidian.desktop"
             "discord.desktop"
           ];
         };
