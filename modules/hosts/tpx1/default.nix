@@ -5,6 +5,7 @@
     # Define modules to import
     modules = with self.nixosModules; [
       tpx1Configuration
+      tpx1Hardware
     ];
   };
 }
