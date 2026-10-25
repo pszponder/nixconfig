@@ -22,6 +22,9 @@ _: {
       gnome-user-docs
     ];
 
-    environment.systemPackages = [ pkgs.xdg-terminal-exec ];
+    environment.systemPackages = [
+      pkgs.xdg-terminal-exec
+      pkgs.wl-clipboard
+    ];
   };
 }
