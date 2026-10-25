@@ -18,6 +18,12 @@
 
       config = {
         package = inputs.nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.ghostty;
+        # Desktop activation must launch the configured wrapper as well.
+        filesToPatch = [
+          "share/applications/*.desktop"
+          "share/dbus-1/services/com.mitchellh.ghostty.service"
+          "lib/systemd/user/app-com.mitchellh.ghostty.service"
+        ];
         flags."--config-file" = config.configFile;
         flagSeparator = "=";
       };
