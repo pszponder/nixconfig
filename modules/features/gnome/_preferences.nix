@@ -40,7 +40,11 @@
             "discord.desktop"
           ];
         };
-
+        "org/gnome/desktop/background" = {
+          picture-uri = "file://${../../../assets/catppuccin-latte.png}";
+          picture-uri-dark = "file://${../../../assets/catppuccin-mocha.png}";
+          picture-options = "zoom";
+        };
       };
     }
   ];
