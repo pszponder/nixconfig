@@ -34,6 +34,7 @@
           fd
           fzf
           gawk
+          gcc
           git
           jq
           jujutsu
@@ -47,6 +48,7 @@
           ripgrep
           starship
           stow
+          tree-sitter
           util-linux
           vim
           wget
