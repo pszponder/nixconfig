@@ -12,6 +12,11 @@
     in
     {
       programs.zsh.enable = true;
+      programs.neovim = {
+        enable = true;
+        viAlias = true;
+        vimAlias = true;
+      };
 
       environment.systemPackages =
         (with pkgs; [
@@ -35,7 +40,6 @@
           just
           kanata
           less
-          neovim
           nix-direnv
           nix-zsh-completions
           nixd
@@ -44,6 +48,7 @@
           starship
           stow
           util-linux
+          vim
           wget
           zoxide
           zsh-autosuggestions
