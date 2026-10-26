@@ -13,7 +13,7 @@ for tool in git just stow; do
 	fi
 done
 
-repo=${1:-"$HOME/repos/github/pszponder/stow-dotfiles"}
+repo=${1:-"$HOME/repos/github/pszponder/dotfiles"}
 url=https://github.com/pszponder/dotfiles.git
 
 if [[ ! -e $repo && ! -L $repo ]]; then

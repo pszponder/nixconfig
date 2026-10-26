@@ -82,4 +82,4 @@ User account definitions, initially `piotr/default.nix`. Piotr is the main user 
 
 ## Bootstrap implementation
 
-The local Stow checkout is `/home/piotr/repos/github/pszponder/stow-dotfiles`, with origin `pszponder/dotfiles`. Bootstrap defaults to `~/repos/github/pszponder/stow-dotfiles`, clones over HTTPS if absent, and runs its `just stow` recipe. It requires the Stow layout and does not pull updates automatically.
+Bootstrap uses [pszponder/dotfiles](https://github.com/pszponder/dotfiles), defaults to `~/repos/github/pszponder/dotfiles`, clones over HTTPS if absent, and runs its `just stow` recipe. It requires the Stow layout and does not pull updates automatically.

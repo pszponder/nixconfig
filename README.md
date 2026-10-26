@@ -107,13 +107,13 @@ The hardware file and `system.stateVersion` retain their existing values.
 
 ## Dotfiles bootstrap
 
-The Stow checkout defaults to `~/repos/github/pszponder/stow-dotfiles`. After resolving old managed links
+The Stow checkout defaults to `~/repos/github/pszponder/dotfiles`. After resolving old managed links
 and reviewing the dotfiles configuration, run as your regular user:
 
 ```sh
 just bootstrap
 # Or select an existing checkout:
-just bootstrap-dotfiles /path/to/stow-dotfiles
+just bootstrap-dotfiles /path/to/dotfiles
 ```
 
 The script clones `pszponder/dotfiles` over HTTPS when needed, validates the origin
