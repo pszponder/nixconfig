@@ -1,5 +1,5 @@
-_: {
-  flake.nixosModules.tpx1Hardware = {
+{
+  flake.modules.nixos.tpx1Hardware = {
     imports = [ ./_hardware-configuration.nix ];
   };
 }

@@ -7,7 +7,7 @@
 
 let
   llm = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
-  bashFiles = "\\.(sh|bash)$|^modules/features/(bash/bashrc|shell/(aliases|bash_profile))$|^scripts/bootstrap-(home|ssh)$";
+  bashFiles = "\\.(sh|bash)$|^scripts/bootstrap-dotfiles$";
 in
 {
   packages = with pkgs; [

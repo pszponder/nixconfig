@@ -4,22 +4,27 @@ set positional-arguments
 # Git pathspecs shared by formatting and checking (includes untracked files).
 nix_files := "'*.nix' ':(exclude)modules/hosts/tpx1/_hardware-configuration.nix'"
 prettier_files := "'*.md' '*.json' '*.yaml' '*.yml'"
-bash_files := "'*.sh' '*.bash' 'modules/features/bash/bashrc' 'modules/features/shell/aliases' 'modules/features/shell/bash_profile' 'scripts/bootstrap-home' 'scripts/bootstrap-ssh'"
+bash_files := "'*.sh' '*.bash' 'scripts/bootstrap-dotfiles'"
 
 # List available recipes
 default:
     @just --list
 
-# Set up home directories and generate missing per-machine SSH keys
-bootstrap: bootstrap-home bootstrap-ssh
+# Use SSH authentication for this repository's origin
+remote-ssh:
+    git remote set-url origin git@github.com:pszponder/nixconfig.git
 
-# Create the default home directory structure; preserve existing contents
-bootstrap-home:
-    bash scripts/bootstrap-home
+# Set up dotfiles after activating the system configuration
+bootstrap: bootstrap-dotfiles
 
-# Generate missing SSH key pairs interactively; preserve existing pairs
-bootstrap-ssh:
-    bash scripts/bootstrap-ssh
+# Generate hardware configuration from the installed system before the first rebuild
+bootstrap-hardware host:
+    sudo nixos-generate-config --show-hardware-config > {{ quote("modules/hosts/" + host + "/_hardware-configuration.nix") }}
+    git diff -- {{ quote("modules/hosts/" + host + "/_hardware-configuration.nix") }}
+
+# Apply dotfiles from an existing checkout or clone the default repository
+bootstrap-dotfiles *args:
+    bash scripts/bootstrap-dotfiles "$@"
 
 # Format supported tracked and new files, excluding generated files
 fmt:

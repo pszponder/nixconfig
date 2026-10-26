@@ -25,22 +25,7 @@
     # Flake parts utils
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";
-
-    # Nix Wrapper Modules
-    wrappers.url = "github:nix-community/nix-wrapper-modules";
-
-    hjem = {
-      url = "github:feel-co/hjem";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  # Default import-tree output (imports /modules automatically)
-  outputs =
-    inputs:
-    # Pass all inputs to outputs
-    inputs.flake-parts.lib.mkFlake {
-      # Call mkFlake from flake-parts module
-      inherit inputs; # Inherit inputs (required to get correct arch for self')
-    } (inputs.import-tree ./modules); # Pass in all modules using import-tree
+  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 }

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ ${EUID} -eq 0 ]]; then
+	echo 'Run bootstrap as your regular user, without sudo.' >&2
+	exit 1
+fi
+
+for tool in git just stow; do
+	if ! command -v "$tool" >/dev/null 2>&1; then
+		printf 'Missing prerequisite: %s. Activate the NixOS configuration first.\n' "$tool" >&2
+		exit 1
+	fi
+done
+
+repo=${1:-"$HOME/repos/github/pszponder/stow-dotfiles"}
+url=https://github.com/pszponder/dotfiles.git
+
+if [[ ! -e $repo && ! -L $repo ]]; then
+	mkdir -p "$(dirname "$repo")"
+	git clone "$url" "$repo"
+else
+	if [[ ! -d "$repo/.git" && ! -f "$repo/.git" ]]; then
+		printf 'Existing path is not a Git checkout: %s\n' "$repo" >&2
+		exit 1
+	fi
+	origin=$(git -C "$repo" remote get-url origin)
+	case "$origin" in
+	https://github.com/pszponder/dotfiles | https://github.com/pszponder/dotfiles.git | git@github.com:pszponder/dotfiles | git@github.com:pszponder/dotfiles.git) ;;
+	*)
+		printf 'Unexpected dotfiles origin: %s\n' "$origin" >&2
+		exit 1
+		;;
+	esac
+fi
+
+# Reuse the checkout as-is and require the Stow layout before applying anything.
+if [[ ! -f "$repo/justfile" || ! -d "$repo/dots" ]]; then
+	printf 'Expected a Stow checkout with justfile and dots/: %s\n' "$repo" >&2
+	exit 1
+fi
+
+cd -- "$repo"
+just stow

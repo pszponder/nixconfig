@@ -1,8 +1,0 @@
-Host github.com
-  User git
-  IdentityFile ~/.ssh/github/pszponder/personal
-  IdentitiesOnly yes
-
-Host * !github.com
-  IdentityFile ~/.ssh/default
-  IdentitiesOnly yes

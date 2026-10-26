@@ -1,4 +1,0 @@
-# shellcheck disable=SC1090,SC1091
-# NixOS reads /etc/profile before this file for login sessions.
-[ ! -f "$HOME/.profile" ] || . "$HOME/.profile"
-[ ! -f "$HOME/.bashrc" ] || . "$HOME/.bashrc"

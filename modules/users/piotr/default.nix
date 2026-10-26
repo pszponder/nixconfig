@@ -1,20 +1,13 @@
-{ self, ... }: {
-  flake.nixosModules.piotr = {
-    imports = [ self.nixosModules.hjem ];
-
+{
+  flake.modules.nixos.piotr = {
     users.users.piotr = {
       isNormalUser = true;
       description = "Piotr";
       extraGroups = [
-        "networkmanager"
-        "wheel"
         "docker"
+        "wheel"
+        "networkmanager"
       ];
-    };
-
-    hjem.users.piotr = {
-      enable = true;
-      clobberFiles = false;
     };
   };
 }

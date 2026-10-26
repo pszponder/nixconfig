@@ -1,5 +1,5 @@
 _: {
-  flake.nixosModules.gnome = { pkgs, ... }: {
+  flake.modules.nixos.gnome = { pkgs, ... }: {
     imports = [
       ./_preferences.nix
       ./_keybindings.nix
@@ -24,7 +24,6 @@ _: {
 
     environment.systemPackages = [
       pkgs.xdg-terminal-exec
-      pkgs.wl-clipboard
     ];
   };
 }
