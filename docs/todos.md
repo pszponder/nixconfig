@@ -2,6 +2,8 @@
 
 ## Todos
 
+- [ ] [Automatic System Updates](https://nixos.wiki/wiki/Automatic_system_upgrades)
+  - [ ] [ NixOS Auto-Upgrades: Complete Guide to Automated System Management](https://www.youtube.com/watch?v=lFnNBD6kw9k)
 - [ ] Add firefox shortcuts
   - [ ] yt
   - [ ] amazon

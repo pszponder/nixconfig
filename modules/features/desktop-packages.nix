@@ -14,9 +14,10 @@
         pkgs.wl-clipboard
       ]
       ++ (with unstable; [
-        brave-origin
+        brave
         discord
         ghostty
+        google-chrome
         obsidian
         vscode
         zed-editor

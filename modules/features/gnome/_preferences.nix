@@ -1,4 +1,15 @@
 { lib, ... }: {
+  xdg.mime = {
+    enable = true;
+    defaultApplications = {
+      "text/html" = "brave.desktop";
+      "x-scheme-handler/http" = "brave.desktop";
+      "x-scheme-handler/https" = "brave.desktop";
+      "x-scheme-handler/about" = "brave.desktop";
+      "x-scheme-handler/unknown" = "brave.desktop";
+    };
+  };
+
   # System defaults; users can override these in their own dconf database.
   programs.dconf.profiles.user.databases = [
     {
@@ -31,7 +42,8 @@
           always-show-log-out = true;
           favorite-apps = [
             "org.gnome.Nautilus.desktop"
-            "firefox.desktop"
+            "brave.desktop"
+            # "firefox.desktop"
             # "brave-origin.desktop"
             "com.mitchellh.ghostty.desktop"
             "code.desktop"
