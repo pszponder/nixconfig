@@ -35,7 +35,7 @@
         gawk
         gcc
         git
-        herdr
+        # herdr
         jq
         jujutsu
         just
@@ -60,8 +60,9 @@
         zsh-syntax-highlighting
         zsh-vi-mode
 
-        # Custom packages
-        llmAgents.codex
+        # Custom packages (llmAgents.<package_name>)
+        # llmAgents.codex
+        llmAgents.herdr
 
         # Unstable packages
         unstable.devenv
