@@ -2,11 +2,11 @@
   xdg.mime = {
     enable = true;
     defaultApplications = {
-      "text/html" = "brave.desktop";
-      "x-scheme-handler/http" = "brave.desktop";
-      "x-scheme-handler/https" = "brave.desktop";
-      "x-scheme-handler/about" = "brave.desktop";
-      "x-scheme-handler/unknown" = "brave.desktop";
+      "text/html" = "brave-browser.desktop";
+      "x-scheme-handler/http" = "brave-browser.desktop";
+      "x-scheme-handler/https" = "brave-browser.desktop";
+      "x-scheme-handler/about" = "brave-browser.desktop";
+      "x-scheme-handler/unknown" = "brave-browser.desktop";
     };
   };
 
@@ -42,12 +42,12 @@
           always-show-log-out = true;
           favorite-apps = [
             "org.gnome.Nautilus.desktop"
-            "brave.desktop"
             # "firefox.desktop"
+            "brave-browser.desktop"
             # "brave-origin.desktop"
             "com.mitchellh.ghostty.desktop"
             "code.desktop"
-            "dev.zed.Zed.desktop"
+            # "dev.zed.Zed.desktop"
             "md.obsidian.Obsidian.desktop"
             "discord.desktop"
           ];
