@@ -14,7 +14,6 @@
         pkgs.wl-clipboard
       ]
       ++ (with unstable; [
-        brave
         discord
         ghostty
         google-chrome
