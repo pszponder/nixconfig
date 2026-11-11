@@ -16,12 +16,6 @@
     # Keep upstream's tested nixpkgs pin for compatibility and binary cache hits.
     llm-agents.url = "github:numtide/llm-agents.nix";
 
-    devenv.url = "github:cachix/devenv";
-    devenv-root = {
-      url = "file+file:///dev/null";
-      flake = false;
-    };
-
     # Flake parts utils
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";

@@ -62,7 +62,8 @@ just bootstrap-hardware tpx1
 
 `bootstrap-hardware` requires an explicit existing host, generates its hardware
 configuration with `sudo nixos-generate-config --show-hardware-config`, and shows
-the Git diff. Run it after booting into the installed system and review the diff
+the Git diff. It replaces the existing file only after generation succeeds.
+Run it after booting into the installed system and review the diff
 before rebuilding. From a live installer, use `--root /mnt` as shown above.
 `just bootstrap` only sets up dotfiles.
 

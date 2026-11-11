@@ -19,8 +19,7 @@ bootstrap: bootstrap-dotfiles
 
 # Generate hardware configuration from the installed system before the first rebuild
 bootstrap-hardware host:
-    sudo nixos-generate-config --show-hardware-config > {{ quote("modules/hosts/" + host + "/_hardware-configuration.nix") }}
-    git diff -- {{ quote("modules/hosts/" + host + "/_hardware-configuration.nix") }}
+    bash scripts/bootstrap-hardware.sh "$1"
 
 # Apply dotfiles from an existing checkout or clone the default repository
 bootstrap-dotfiles *args:
