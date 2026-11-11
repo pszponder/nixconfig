@@ -14,6 +14,7 @@
       gnome
       docker
       kanata
+      nixMaintenance
     ];
 
     boot = {
@@ -41,6 +42,10 @@
       };
     };
     security.rtkit.enable = true;
+    services.nix-maintenance = {
+      enable = true;
+      flake = "/home/piotr/repos/github/pszponder/nixconfig";
+    };
     services = {
       printing.enable = true;
       pulseaudio.enable = false;
