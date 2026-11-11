@@ -66,3 +66,11 @@ switch host=`hostname`:
 # Update flake.lock; optionally name specific inputs
 update *inputs:
     nix flake update "$@"
+
+# Preview store paths eligible for garbage collection
+gc-preview:
+    nix store gc --dry-run
+
+# Remove unreachable store paths
+gc:
+    sudo nix store gc
