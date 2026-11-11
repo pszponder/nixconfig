@@ -1,12 +1,12 @@
 {
-  inputs,
+  # inputs,
   pkgs,
   lib,
   ...
 }:
 
 let
-  llm = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
+  # llm = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system};
   bashFiles = "\\.(sh|bash)$|^scripts/bootstrap-dotfiles$";
 in
 {
@@ -22,7 +22,7 @@ in
     shellcheck
     statix
     taplo
-    llm.codex
+    # llm.codex
   ];
 
   git-hooks.excludes = [ "^modules/hosts/tpx1/_hardware-configuration\\.nix$" ];

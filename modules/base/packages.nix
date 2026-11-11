@@ -26,7 +26,9 @@
         bash-language-server
         clang-tools
         cmake-language-server
+        llmAgents.codex
         delta
+        unstable.devenv
         direnv
         dnsutils
         eza
@@ -35,7 +37,7 @@
         gawk
         gcc
         git
-        # herdr
+        llmAgents.herdr
         jq
         jujutsu
         just
@@ -59,13 +61,6 @@
         zsh-fzf-tab
         zsh-syntax-highlighting
         zsh-vi-mode
-
-        # Custom packages (llmAgents.<package_name>)
-        # llmAgents.codex
-        llmAgents.herdr
-
-        # Unstable packages
-        unstable.devenv
       ];
     };
 }
