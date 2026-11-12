@@ -22,6 +22,7 @@
         bat
         bash-completion
         bash-language-server
+        bubblewrap
         clang-tools
         cmake-language-server
         llmAgents.codex
