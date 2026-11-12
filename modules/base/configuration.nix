@@ -1,5 +1,11 @@
+{ inputs, ... }:
 {
-  flake.modules.nixos.baseConfiguration = { pkgs, ... }: {
+  flake.modules.nixos.baseConfiguration = { config, pkgs, ... }: {
+    _module.args.pkgsStable = import inputs.nixpkgs-stable {
+      system = pkgs.stdenv.hostPlatform.system;
+      config = config.nixpkgs.config;
+    };
+
     fonts.packages = with pkgs.nerd-fonts; [
       caskaydia-cove
       caskaydia-mono

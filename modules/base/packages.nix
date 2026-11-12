@@ -5,10 +5,6 @@
     let
       system = pkgs.stdenv.hostPlatform.system;
       llmAgents = inputs.llm-agents.packages.${system};
-      unstable = import inputs.nixpkgs-unstable {
-        inherit system;
-        config.allowUnfree = true;
-      };
     in
     {
       programs.zsh.enable = true;
@@ -28,7 +24,7 @@
         cmake-language-server
         llmAgents.codex
         delta
-        unstable.devenv
+        devenv
         direnv
         dnsutils
         eza

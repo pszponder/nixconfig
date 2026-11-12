@@ -83,6 +83,13 @@ the updated hardware file and any installation-specific changes back to Git.
 See the [NixOS configuration documentation](https://nixos.org/manual/nixos/stable/#sec-changing-config)
 for rebuilding and rollback.
 
+## Package channels
+
+NixOS and `pkgs` use the pinned `nixos-unstable` input by default. Modules that
+import `baseConfiguration` can also accept `pkgsStable` as an argument and use,
+for example, `pkgsStable.hello` to select a package from the pinned stable
+`nixos-26.05` input. Both package sets use the system's Nixpkgs configuration.
+
 ## Working on the configuration
 
 After setting up your GitHub SSH key, switch an HTTPS clone's origin to SSH:

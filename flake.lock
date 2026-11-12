@@ -178,8 +178,8 @@
         "flake-parts": "flake-parts",
         "import-tree": "import-tree",
         "llm-agents": "llm-agents",
-        "nixpkgs": "nixpkgs_2",
-        "nixpkgs-unstable": "nixpkgs-unstable"
+        "nixpkgs": "nixpkgs-unstable",
+        "nixpkgs-stable": "nixpkgs_2"
       }
     },
     "systems": {
