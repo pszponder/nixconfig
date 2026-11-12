@@ -4,12 +4,13 @@
     {
       programs.firefox.enable = true;
       environment.systemPackages = with pkgs; [
-        wl-clipboard
         discord
         ghostty
         google-chrome
+        libreoffice
         obsidian
         vscode
+        wl-clipboard
         zed-editor
       ];
     };
