@@ -39,6 +39,7 @@
         just
         kanata
         less
+        nh
         nix-direnv
         nix-zsh-completions
         nixd
