@@ -6,6 +6,9 @@ nix_files := "'*.nix' ':(exclude)modules/hosts/tpx1/_hardware-configuration.nix'
 prettier_files := "'*.md' '*.json' '*.yaml' '*.yml'"
 bash_files := "'*.sh' '*.bash' 'scripts/bootstrap-dotfiles'"
 
+# Match scheduled nh cleanup: retain recent generations and development roots.
+nh_clean_args := "--keep-since 30d --keep 3 --no-gcroots"
+
 # List available recipes
 default:
     @just --list
@@ -57,20 +60,24 @@ ok: fmt validate
 
 # Build a host without activating it; creates ./result
 build host=`hostname`:
-    nix build -L {{ quote(".#nixosConfigurations." + host + ".config.system.build.toplevel") }}
+    nh os build . -H {{ quote(host) }} --out-link ./result
 
-# Build, activate, and make the host configuration the boot default
+# Build, review changes, confirm, and activate as the boot default
 switch host=`hostname`:
-    sudo nixos-rebuild switch --flake {{ quote(".#" + host) }}
+    nh os switch . -H {{ quote(host) }} --ask
+
+# Update all flake inputs, build, and confirm before activation
+up host=`hostname`:
+    nh os switch . -H {{ quote(host) }} --update --ask
 
 # Update flake.lock; optionally name specific inputs
 update *inputs:
     nix flake update "$@"
 
-# Preview store paths eligible for garbage collection
+# Preview generation pruning and garbage collection with the scheduled retention policy
 gc-preview:
-    nix store gc --dry-run
+    sudo nh clean all --dry {{ nh_clean_args }}
 
-# Remove unreachable store paths
+# Confirm pruning old generations and collecting garbage; retain 30 days and at least 3 generations
 gc:
-    sudo nix store gc
+    sudo nh clean all --ask {{ nh_clean_args }}

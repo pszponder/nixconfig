@@ -11,7 +11,7 @@
           type = lib.types.nullOr lib.types.str;
           default = null;
           example = "/etc/nixos";
-          description = "Flake path or URI to use for scheduled NixOS upgrades.";
+          description = "Flake path or URI to use for nh and scheduled NixOS upgrades.";
         };
       };
 
@@ -23,10 +23,15 @@
           }
         ];
 
-        nix.gc = {
-          automatic = true;
-          dates = "weekly";
-          options = "--delete-older-than 30d";
+        programs.nh = {
+          enable = true;
+          inherit (cfg) flake;
+          clean = {
+            enable = true;
+            dates = "weekly";
+            # Preserve development roots and at least three rollback generations.
+            extraArgs = "--keep-since 30d --keep 3 --no-gcroots";
+          };
         };
 
         system.autoUpgrade = {
@@ -34,9 +39,14 @@
           inherit (cfg) flake;
           dates = "Sun 18:00";
           randomizedDelaySec = "45min";
-          flags = [ "--print-build-logs" ];
+          # Flake inputs are updated explicitly; --upgrade only updates channels.
+          upgrade = false;
+          flags = [
+            "--update-input"
+            "nixpkgs"
+            "--print-build-logs"
+          ];
           allowReboot = false;
-          runGarbageCollection = true;
         };
       };
     };

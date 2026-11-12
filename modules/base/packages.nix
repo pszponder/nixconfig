@@ -7,11 +7,13 @@
       llmAgents = inputs.llm-agents.packages.${system};
     in
     {
-      programs.zsh.enable = true;
-      programs.neovim = {
-        enable = true;
-        viAlias = true;
-        vimAlias = true;
+      programs = {
+        zsh.enable = true;
+        neovim = {
+          enable = true;
+          viAlias = true;
+          vimAlias = true;
+        };
       };
 
       environment.systemPackages = with pkgs; [
@@ -39,7 +41,6 @@
         just
         kanata
         less
-        nh
         nix-direnv
         nix-zsh-completions
         nixd

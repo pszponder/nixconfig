@@ -113,6 +113,9 @@ working-tree check, use `nix flake check path:.` and
 After reviewing the build, activate with `just switch tpx1`.
 The hardware file and `system.stateVersion` retain their existing values.
 
+For package updates, cleanup, automatic upgrade schedules, and troubleshooting,
+see the [maintenance guide](docs/maintenance.md).
+
 ## Dotfiles bootstrap
 
 The Stow checkout defaults to `~/repos/github/pszponder/dotfiles`. After resolving old managed links
