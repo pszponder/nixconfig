@@ -33,7 +33,11 @@ macOS and Ubuntu configuration are deferred.
    cd /mnt/etc/nixos
    # Check out the branch or commit you want to install before continuing.
    nixos-generate-config --root /mnt --show-hardware-config > modules/hosts/tpx1/_hardware-configuration.nix
-   nixos-install --option extra-experimental-features 'nix-command flakes' --flake .#tpx1
+   nixos-install \
+     --option extra-experimental-features 'nix-command flakes' \
+     --option extra-substituters https://cache.numtide.com \
+     --option extra-trusted-public-keys 'niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=' \
+     --flake .#tpx1
    nixos-enter --root /mnt --command 'passwd piotr'
    reboot
    ```
@@ -73,7 +77,11 @@ the installed system's `system.stateVersion` in `modules/hosts/tpx1/default.nix`
 The installer-created password for `piotr` is retained.
 
 ```sh
-sudo nixos-rebuild switch --option extra-experimental-features 'nix-command flakes' --flake .#tpx1
+sudo nixos-rebuild switch \
+  --option extra-experimental-features 'nix-command flakes' \
+  --option extra-substituters https://cache.numtide.com \
+  --option extra-trusted-public-keys 'niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=' \
+  --flake .#tpx1
 just bootstrap
 sudo reboot
 ```
@@ -82,6 +90,13 @@ This applies the repo to the existing installation without repartitioning. Save
 the updated hardware file and any installation-specific changes back to Git.
 See the [NixOS configuration documentation](https://nixos.org/manual/nixos/stable/#sec-changing-config)
 for rebuilding and rollback.
+
+Both initial setup commands explicitly enable Numtide's binary cache and signing
+key so packages from `llm-agents.nix` can download before this configuration is
+activated. The `extra-` options preserve the default NixOS cache. After activation,
+`modules/base/configuration.nix` supplies these settings system-wide, so normal
+builds and updates need no cache flags. Cache settings are kept out of the flake's
+`nixConfig` to avoid restricted-setting warnings for regular users.
 
 ## Package channels
 

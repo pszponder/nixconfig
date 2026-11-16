@@ -1,11 +1,6 @@
 {
   description = "Nix Config";
 
-  nixConfig = {
-    extra-substituters = [ "https://cache.numtide.com" ];
-    extra-trusted-public-keys = [ "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=" ];
-  };
-
   inputs = {
     # Unstable nixpkgs is the default for NixOS and packages.
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
