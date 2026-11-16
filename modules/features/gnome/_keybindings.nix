@@ -25,6 +25,7 @@ in
           toggle-tiled-right = [ "<Super>l" ];
         };
         "org/gnome/shell/keybindings" = {
+          show-screenshot-ui = emptyBindings;
           toggle-message-tray = [ "<Super>v" ];
         }
         // lib.genAttrs (map (n: "switch-to-application-${n}") workspaceNumbers) (_: emptyBindings);
@@ -38,7 +39,13 @@ in
           logout = emptyBindings;
           custom-keybindings = [
             "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/"
+            "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flameshot/"
           ];
+        };
+        "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/flameshot" = {
+          name = "Take screenshot with Flameshot";
+          command = "${pkgs.flameshot}/bin/flameshot gui";
+          binding = "Print";
         };
         "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal" = {
           name = "Launch default terminal";
