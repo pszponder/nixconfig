@@ -15,6 +15,7 @@
       docker
       kanata
       nixMaintenance
+      printing
     ];
 
     boot = {
@@ -47,7 +48,6 @@
       flake = "/home/piotr/repos/github/pszponder/nixconfig";
     };
     services = {
-      printing.enable = true;
       pulseaudio.enable = false;
       pipewire = {
         enable = true;
