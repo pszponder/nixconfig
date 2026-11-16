@@ -5,6 +5,7 @@
       programs.firefox.enable = true;
       environment.systemPackages = with pkgs; [
         discord
+        flameshot
         ghostty
         google-chrome
         libreoffice
