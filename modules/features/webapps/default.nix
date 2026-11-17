@@ -62,6 +62,16 @@
         app:
         let
           id = "webapp-${builtins.substring 0 16 (builtins.hashString "sha256" app.url)}";
+          # Chrome identifies URL apps by host + "_" + path, not by our launcher ID.
+          urlParts = builtins.match "https?://([^/?#]+)([^?#]*).*" app.url;
+          host = lib.toLower (builtins.elemAt urlParts 0);
+          path = builtins.elemAt urlParts 1;
+          appName = "${host}_${if path == "" then "/" else path}";
+          illegalChars = lib.stringToCharacters "<>:\"/\\|?*";
+          sanitizedAppName = lib.replaceStrings illegalChars (map (_: "_") illegalChars) appName;
+          # X11 trims surrounding underscores; Wayland keeps them in its desktop ID.
+          wmClass = builtins.head (builtins.match "_*([^_](.*[^_])?)_*" sanitizedAppName);
+          desktopId = "chrome-${lib.replaceStrings [ " " ] [ "_" ] sanitizedAppName}-Default";
           iconSource = pkgs.fetchurl {
             url = app.iconUrl;
             hash = app.iconHash;
@@ -75,15 +85,16 @@
             else
               iconSource;
           launcher = pkgs.writeShellScript id ''
-            exec ${pkgs.google-chrome}/bin/google-chrome-stable --app=${lib.escapeShellArg app.url} "$@"
+            exec ${pkgs.google-chrome}/bin/google-chrome-stable --profile-directory=Default --app=${lib.escapeShellArg app.url} "$@"
           '';
         in
         pkgs.makeDesktopItem {
-          name = id;
+          name = desktopId;
           desktopName = app.name;
           exec = "${launcher}";
           icon = "${icon}";
           terminal = false;
+          startupWMClass = wmClass;
           categories = [ "Network" ];
         }
       ) webapps;
