@@ -67,8 +67,7 @@ build host=`hostname`:
 switch host=`hostname`:
     sudo nixos-rebuild switch --flake .#{{ quote(host) }}
 
-# Confirm, update all flake inputs, build, and activate
-[confirm("Update all flake inputs and activate the system configuration?")]
+# Update all flake inputs, build, and activate without confirmation
 up host=`hostname`:
     nix flake update
     sudo nixos-rebuild switch --flake .#{{ quote(host) }}
@@ -76,6 +75,18 @@ up host=`hostname`:
 # Update flake.lock; optionally name specific inputs
 update *inputs:
     nix flake update "$@"
+
+# Show system profile generations
+history:
+    nix profile history --profile /nix/var/nix/profiles/system
+
+# Explore this checkout's flake outputs interactively
+repl:
+    nix repl .
+
+# List automatic garbage collection roots
+gc-roots:
+    ls -l /nix/var/nix/gcroots/auto/
 
 # Preview cleanup without deleting generations or store paths
 gc-preview:
