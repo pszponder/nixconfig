@@ -2,28 +2,27 @@
 
 [Back to the README](../README.md#working-on-the-configuration).
 
-## Using nh
+## Building and switching
 
-`nh` is enabled system-wide. On `tpx1`, its default flake is the checkout at
-`/home/piotr/repos/github/pszponder/nixconfig`, so these commands work from any
-directory:
+Run these standard Nix commands from this checkout, selecting a host explicitly:
 
 ```sh
-nh os build
-nh os test
-nh os switch --ask
+nix build .#nixosConfigurations.tpx1.config.system.build.toplevel
+sudo nixos-rebuild test --flake .#tpx1
+sudo nixos-rebuild switch --flake .#tpx1
 ```
 
-`build` builds without activating, `test` activates without changing the boot
-default, and `switch --ask` asks for confirmation before persistent activation.
-Run nh as your regular user; it requests elevated privileges when needed.
-For another checkout, pass its path explicitly, for example `nh os build . -H tpx1`.
-`just build` and `just switch` use nh and explicitly target this checkout.
-`just build` keeps its output at `./result`; `just switch` asks for confirmation
-before activation. The development shell also supplies nh.
+`build` builds without activating and keeps the output at `./result`. `test`
+activates without changing the boot default; `switch` also makes the configuration
+persistent across reboots. Use an absolute flake path to run from another directory.
 
-`just switch` builds from the existing lockfile without requesting newer input
-revisions. To update all flake inputs and switch in one command, run:
+`just build` and `just switch` target this checkout and default to the current
+hostname. `just switch` asks for confirmation **before building**, then runs
+`sudo nixos-rebuild switch`. To inspect changes before switching, run
+`sudo nixos-rebuild dry-activate --flake .#tpx1` separately.
+
+`just switch` uses the existing lockfile without requesting newer input revisions.
+To update all flake inputs and switch in one command, run:
 
 ```sh
 just up
@@ -31,41 +30,49 @@ just up
 just up tpx1
 ```
 
-This updates `flake.lock`, builds, shows the package changes, and asks for
-confirmation before activation. Lockfile changes remain even if the build fails
-or you decline activation; review and commit them with Git. It updates the system
+This asks for confirmation, runs `nix flake update` as your regular user, then
+builds and activates with `sudo nixos-rebuild switch`. Lockfile changes remain
+if the build fails; review and commit them with Git. This updates the system
 flake's inputs, not the separate `devenv.lock`.
 
 For a selective update with validation before activation, run `just update nixpkgs`,
 review `git diff -- flake.lock`, run `just validate`, then run `just switch tpx1`.
 
-Scheduled nh cleanup runs weekly, retaining generations from the last 30 days
-and at least three generations per profile. It preserves build and devenv GC
-roots. Preview cleanup with the same retention settings:
+## Cleanup
+
+The standard NixOS `nix.gc` service runs weekly with
+`--delete-older-than 30d`. It prunes old profile generations, then collects
+unreachable store paths. Current generations and live build and development GC
+roots remain protected. This age-based policy does not guarantee a minimum of
+three generations; a rarely updated profile may retain fewer rollback options.
+
+Preview cleanup without deleting generations or store paths:
 
 ```sh
 just gc-preview
+# Equivalent command:
+sudo nix-collect-garbage --dry-run --delete-older-than 30d
 ```
 
-Run `just gc` to perform that cleanup with confirmation. It prunes old profile
-generations as well as collecting unreachable store paths, while preserving the
-same retention policy and development roots as scheduled cleanup.
-
-Automatic upgrades run Sundays at 18:00 with up to 45 minutes of random delay.
-They update the `nixpkgs` flake input, rebuild, and activate without automatic
-reboot. Other inputs remain pinned. The job writes `flake.lock` in the configured
-checkout without committing or pushing it; review and commit that diff afterward.
-If the build fails, the lockfile may still contain the updated pin.
-Cleanup is handled separately by nh.
-
-## First switch and shell reloads
-
-If `just switch` reports `nh: command not found`, load the updated development
-environment explicitly for the first switch:
+The dry run does not remove profile roots, so the store paths it reports may omit
+paths that become collectible after actual generation pruning. Run `just gc` to
+confirm and perform cleanup, or run the underlying command directly:
 
 ```sh
-devenv shell -- just switch tpx1
+sudo nix-collect-garbage --delete-older-than 30d
 ```
 
-This supplies nh before it is installed system-wide. An already running shell
-may need to be re-entered after changing `devenv.nix`.
+Inspect the scheduled cleanup with `systemctl status nix-gc.timer` and
+`journalctl -u nix-gc.service`.
+
+## Automatic upgrades
+
+The standard NixOS `system.autoUpgrade` service runs Sundays at 18:00 with up to
+45 minutes of random delay. It updates the `nixpkgs` flake input, rebuilds, and
+activates without automatic reboot. Other inputs remain pinned. The job writes
+`flake.lock` in the configured checkout without committing or pushing it; review
+and commit that diff afterward. If the build fails, the lockfile may still contain
+the updated pin. Cleanup runs separately through `nix-gc.service`.
+
+Inspect upgrades with `systemctl status nixos-upgrade.timer` and
+`journalctl -u nixos-upgrade.service`.

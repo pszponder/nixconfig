@@ -2,8 +2,6 @@
 
 ## Todos
 
-- [ ] [Automatic System Updates](https://nixos.wiki/wiki/Automatic_system_upgrades)
-  - [ ] [ NixOS Auto-Upgrades: Complete Guide to Automated System Management](https://www.youtube.com/watch?v=lFnNBD6kw9k)
 - [ ] Add firefox shortcuts
   - [ ] yt
   - [ ] amazon
@@ -12,7 +10,6 @@
 - [ ] add tmux
 - [ ] add herdr
 - [ ] add custom nvim configurations
-- [ ] Add libreoffice
 - [ ] configure printer?
 - [ ] Add zen browser (should I try to create my own flake?)
 - [ ] Review repo for best practices applied per https://flake.parts/
@@ -20,6 +17,9 @@
 
 ## Completed Todos
 
+- [x] [Automatic System Updates](https://nixos.wiki/wiki/Automatic_system_upgrades)
+  - [x] [ NixOS Auto-Upgrades: Complete Guide to Automated System Management](https://www.youtube.com/watch?v=lFnNBD6kw9k)
+- [x] Add libreoffice
 - [x] Configure git
 - [x] Configure ssh keys
 - [x] Configure standard files (per home-directory-structure.md)

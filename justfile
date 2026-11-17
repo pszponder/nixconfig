@@ -6,8 +6,8 @@ nix_files := "'*.nix' ':(exclude)modules/hosts/tpx1/_hardware-configuration.nix'
 prettier_files := "'*.md' '*.json' '*.yaml' '*.yml'"
 bash_files := "'*.sh' '*.bash' 'scripts/bootstrap-dotfiles'"
 
-# Match scheduled nh cleanup: retain recent generations and development roots.
-nh_clean_args := "--keep-since 30d --keep 3 --no-gcroots"
+# Match scheduled Nix garbage collection: retain 30 days of generations.
+gc_args := "--delete-older-than 30d"
 
 # List available recipes
 default:
@@ -60,24 +60,28 @@ ok: fmt validate
 
 # Build a host without activating it; creates ./result
 build host=`hostname`:
-    nh os build . -H {{ quote(host) }} --out-link ./result
+    nix build .#nixosConfigurations.{{ quote(host) }}.config.system.build.toplevel --out-link ./result
 
-# Build, review changes, confirm, and activate as the boot default
+# Confirm, build, and activate as the boot default
+[confirm("Build and activate the system configuration?")]
 switch host=`hostname`:
-    nh os switch . -H {{ quote(host) }} --ask
+    sudo nixos-rebuild switch --flake .#{{ quote(host) }}
 
-# Update all flake inputs, build, and confirm before activation
+# Confirm, update all flake inputs, build, and activate
+[confirm("Update all flake inputs and activate the system configuration?")]
 up host=`hostname`:
-    nh os switch . -H {{ quote(host) }} --update --ask
+    nix flake update
+    sudo nixos-rebuild switch --flake .#{{ quote(host) }}
 
 # Update flake.lock; optionally name specific inputs
 update *inputs:
     nix flake update "$@"
 
-# Preview generation pruning and garbage collection with the scheduled retention policy
+# Preview cleanup without deleting generations or store paths
 gc-preview:
-    sudo nh clean all --dry {{ nh_clean_args }}
+    sudo nix-collect-garbage --dry-run {{ gc_args }}
 
-# Confirm pruning old generations and collecting garbage; retain 30 days and at least 3 generations
+# Confirm pruning generations older than 30 days and collecting garbage
+[confirm("Prune generations older than 30 days and collect garbage?")]
 gc:
-    sudo nh clean all --ask {{ nh_clean_args }}
+    sudo nix-collect-garbage {{ gc_args }}

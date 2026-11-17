@@ -16,7 +16,6 @@ in
     deadnix
     git
     just
-    nh
     nixfmt
     prettier
     shfmt
