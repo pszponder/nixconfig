@@ -26,6 +26,8 @@ just switch tpx1   # Confirm and activate as the boot default
 
 `diff` always compares against the local `/run/current-system`; use it for the local host. `preview` runs `nixos-rebuild dry-activate`, whose service-change report may be incomplete. `test` and `switch` ask for confirmation **before building**, then run `sudo nixos-rebuild`. A temporary activation does not automatically roll back if access is lost; rebooting restores the boot default. It does not test booting a new kernel.
 
+Confirmation prompts for `test`, `switch`, `up`, `deploy`, and `gc` show `[y/N]`: enter `y` or `yes` to proceed, or press Enter to cancel.
+
 `just switch` uses the existing lockfile without requesting newer input revisions. To update all flake inputs and switch in one command, run:
 
 ```sh
@@ -34,11 +36,42 @@ just up
 just up tpx1
 ```
 
-This runs without confirmation, updates all inputs with `nix flake update` as your regular user, then builds and activates with `sudo nixos-rebuild switch`. The update writes `flake.lock`; it does not rewrite input declarations in `flake.nix` or update the separate `devenv.lock`. Sudo may prompt for your password. Lockfile changes remain if activation fails; review and commit them with Git. An update failure stops the recipe before switching.
+This asks for confirmation before updating all inputs with `nix flake update` as your regular user, then builds and activates with `sudo nixos-rebuild switch`. The update writes `flake.lock`; it does not rewrite input declarations in `flake.nix` or update the separate `devenv.lock`. Sudo may prompt for your password. Lockfile changes remain if activation fails; review and commit them with Git. An update failure stops the recipe before switching.
 
 For a selective update with validation before activation, run `just update nixpkgs`, review `git diff -- flake.lock`, run `just validate`, then run `just switch tpx1`.
 
 Inspect system generations with `just history`, explore this checkout's flake outputs with `just repl`, and list automatic GC roots with `just gc-roots`.
+
+## Fingerprint setup on `tpx1`
+
+The host enables `fprintd` for its Synaptics `06cb:00bd` reader. GDM provides fingerprint authentication for GNOME login and screen unlock. General PAM integration is disabled with `services.fprintd.enablePam = false`, so this does not enable fingerprints for `sudo` or other PAM services.
+
+The reusable `fingerprint` aspect lives in `modules/features/fingerprint.nix`; hosts opt in through their imports. It enables the reader service independently of the desktop. For Niri or Hyprland, retain this feature and configure fingerprint authentication in the chosen display manager and screen locker. Enrollment stays local and can be reused after changing desktops.
+
+Activate the configuration, then enroll as your regular user **without sudo**:
+
+```sh
+just switch tpx1
+just fingerprint-setup
+# Optionally enroll another finger:
+just fingerprint-setup left-index-finger
+```
+
+The helper checks that the tools are installed, prints scanning instructions, starts interactive enrollment, and then verifies the selected finger. The GNOME password dialog only authorizes enrollment; return to the terminal afterward. Repeatedly touch and lift the same finger, varying its position slightly. Each `enroll-stage-passed` means one scan succeeded, so keep going until `enroll-completed`. Then touch the reader again for verification and look for `verify-match`. Physical scans cannot be automated. Running it again for the same finger replaces that finger's enrollment; ordinary rebuilds never run enrollment. GNOME Settings → Users → Fingerprint Login provides a graphical alternative.
+
+Enrollment data stays local under `/var/lib/fprint/` and, depending on the reader, in device storage. It is never imported into Nix or copied into this checkout. Rebuilds and reboots preserve it; after a clean installation, enroll again. If the host later uses an ephemeral root filesystem, persist `/var/lib/fprint/` separately.
+
+Keep your account password: fingerprint login cannot unlock the GNOME login keyring using your password, so the keyring may prompt separately. It also does not replace a boot-time disk encryption password.
+
+To inspect enrollment or troubleshoot a reader that is unavailable:
+
+```sh
+fprintd-list "$(id -un)"
+fprintd-verify
+journalctl -u fprintd.service -b
+```
+
+`fprintd` starts on demand over D-Bus; being inactive when idle is normal. See the [fprintd manual](https://man.archlinux.org/man/fprintd.1.en) and [NixOS GDM integration](https://github.com/NixOS/nixpkgs/blob/d5cc6833999746cffdfe0598f7bc801a57b887a9/nixos/modules/services/display-managers/gdm.nix).
 
 ## Future SSH deployments
 

@@ -17,6 +17,7 @@
       kanata
       nixMaintenance
       printing
+      fingerprint
     ];
 
     boot = {
