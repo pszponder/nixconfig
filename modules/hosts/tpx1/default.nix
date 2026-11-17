@@ -11,6 +11,7 @@
       tpx1Hardware
       piotr
       desktopPackages
+      webapps
       gnome
       docker
       kanata
