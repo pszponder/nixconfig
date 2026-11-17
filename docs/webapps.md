@@ -2,7 +2,7 @@
 
 The `webapps` feature creates GNOME application launchers that open websites in Google Chrome's app mode. Firefox remains the default browser. All apps use the normal Chrome profile, so Google logins can be shared between apps.
 
-The predefined list includes Gmail, Google Docs, Google Photos, YouTube, YouTube Music, ChatGPT, Grok and X. Edit `webapps` in `modules/features/webapps/default.nix` to add or remove entries. Each entry has a `name`, `url`, `iconUrl` and `iconHash`.
+The predefined list includes Gmail, Google Docs, Google Photos, YouTube, YouTube Music, ChatGPT, Grok and X. Edit `webapps` in `modules/features/webapps/default.nix` to add or remove entries. Each entry has a `name`, `url`, `iconName` and `iconHash`.
 
 Importing the `webapps` feature installs the list; there are no custom NixOS options. After rebuilding, launch the apps from GNOME's application menu or pin them to the dash. Removing an entry removes its launcher on the next rebuild. Names can be customized without changing the launcher ID.
 
@@ -14,12 +14,14 @@ After updating from the old `webapp-<hash>` launchers, rebuild, close existing w
 
 ## Icons
 
-Each app has a fixed, direct icon URL and a SHA-256 hash. Nix downloads and verifies the icon when building the launcher, and stores it in the Nix store. Icons are available immediately after activation, including offline. ICO sources are converted to PNG during the build; PNG and SVG are used directly. There is no background downloader or user icon cache to maintain.
+All icons come from [Dashboard Icons](https://github.com/homarr-labs/dashboard-icons), the collection recommended by [Omarchy's web app documentation](https://github.com/omacom/omarchy/blob/quattro/manual/25-web-apps.md). The shared `iconBaseUrl` pins a Git revision and selects its `png` directory. Each app's `iconName` is the filename without `.png`, such as `google-docs`.
 
-When adding or updating an icon, get its hash with:
+Nix downloads and verifies each PNG against its `iconHash` when building the launcher, and stores it in the Nix store. Icons are available immediately after activation, including offline. There is no background downloader or user icon cache to maintain.
+
+When adding an icon, get its hash using the revision in `iconBaseUrl`:
 
 ```sh
-nix store prefetch-file --json 'https://example.com/icon.png'
+nix store prefetch-file --json 'https://raw.githubusercontent.com/homarr-labs/dashboard-icons/<revision>/png/<iconName>.png'
 ```
 
-Copy the URL into `iconUrl` and the returned `hash` into `iconHash`. If the upstream file changes, the hash check fails until you review the new icon and update its hash. Cached icons do not need to be downloaded again for each rebuild.
+Set `iconName` and copy the returned `hash` into `iconHash`. To update the collection, change the revision in `iconBaseUrl`, review all eight icons, and refresh their hashes. Cached icons do not need to be downloaded again for each rebuild.
