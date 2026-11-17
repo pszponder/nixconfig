@@ -62,10 +62,42 @@ ok: fmt validate
 build host=`hostname`:
     nix build .#nixosConfigurations.{{ quote(host) }}.config.system.build.toplevel --out-link ./result
 
+# Build and compare packages with the currently running local system
+diff host=`hostname`: (build host)
+    nix store diff-closures /run/current-system ./result
+
+# Build and preview activation changes without applying them
+preview host=`hostname`:
+    sudo nixos-rebuild dry-activate --flake .#{{ quote(host) }}
+
+# Activate temporarily, preserving the current boot default
+[confirm("Build and temporarily activate the system configuration?")]
+test host=`hostname`:
+    sudo nixos-rebuild test --flake .#{{ quote(host) }}
+
 # Confirm, build, and activate as the boot default
 [confirm("Build and activate the system configuration?")]
 switch host=`hostname`:
     sudo nixos-rebuild switch --flake .#{{ quote(host) }}
+
+# Deploy over SSH: host target [switch|test|boot|dry-activate] [build-host]
+[confirm("Build and deploy to the specified SSH target?")]
+deploy host target action="switch" build_host="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [[ -z "$1" || -z "$2" ]]; then
+        echo "A configuration name and nonempty SSH target are required." >&2
+        exit 1
+    fi
+    case "$3" in
+        switch|test|boot|dry-activate) ;;
+        *) echo "Action must be switch, test, boot, or dry-activate." >&2; exit 1 ;;
+    esac
+    args=("$3" --flake ".#$1" --target-host "$2" --elevate sudo --ask-elevate-password)
+    if [[ -n "$4" ]]; then
+        args+=(--build-host "$4")
+    fi
+    nixos-rebuild "${args[@]}"
 
 # Update all flake inputs, build, and activate without confirmation
 up host=`hostname`:

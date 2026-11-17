@@ -8,6 +8,7 @@
 - [Nixcademy - Posts](https://nixcademy.com/posts/)
 - [Nix Installer](https://github.com/NixOS/nix-installer)
 - [ryan4yin/nixos-and-flakes-book](https://github.com/ryan4yin/nixos-and-flakes-book)
+  - [Simplifying NixOS-Related Commands | NixOS & Flakes Book](https://nixos-and-flakes.thiscute.world/best-practices/simplify-nixos-related-commands)
 
 ## Devenv
 
