@@ -12,7 +12,6 @@
 - [ ] [qutebrowser | qutebrowser](https://qutebrowser.org/)
   - [ ] [Boost Your Productivity with Qutebrowser (Keyboard‑First Browser) on Linux!](https://www.youtube.com/watch?v=_4CWJnCB3To)
 - [ ] [Simplifying NixOS-Related Commands | NixOS & Flakes Book](https://nixos-and-flakes.thiscute.world/best-practices/simplify-nixos-related-commands)
-- [ ] [nix-config/Justfile at main · ryan4yin/nix-config](https://github.com/ryan4yin/nix-config/blob/main/Justfile)
 - [ ] What's the best way to symlink codex config without constantly committing it due to it's changing nature. I only want my customizations to the status lines to be tracked, not for example trusted repos
 - [ ] [How I Packaged a .deb File (Helium Browser) for NixOS with Flakes | by oxcl | Medium](https://medium.com/@oxcl/how-i-packaged-a-deb-file-for-nixos-with-flakes-ed4e4eb7dbac) => [[nix-packaging]]
 - [ ] add tmux
@@ -23,6 +22,7 @@
 
 ## Completed Todos
 
+- [x] [Review ryan4yin's Justfile](maintenance.md#justfile-review)
 - [x] Investigate how to create web apps in nix (how does omarchy do it and how to adapt to nix)
 - [x] configure printer?
 - [x] Add firefox shortcuts
