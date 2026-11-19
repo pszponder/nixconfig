@@ -4,7 +4,7 @@
 
 - [ ] Port things I like about Omarchy to NixOS
 - [ ] Have AI review repos which packages / convert apps to Flakes (ex. like helium from deb) and create a skill using the process
-  - [ ] [How I Packaged a .deb File (Helium Browser) for NixOS with Flakes | by oxcl | Medium](https://medium.com/@oxcl/how-i-packaged-a-deb-file-for-nixos-with-flakes-ed4e4eb7dbac) => [[nix-packaging]]
+  - [ ] [How I Packaged a .deb File (Helium Browser) for NixOS with Flakes | by oxcl | Medium](https://medium.com/@oxcl/how-i-packaged-a-deb-file-for-nixos-with-flakes-ed4e4eb7dbac)
   - [ ] Zen Browser
   - [ ] Helium Browser
   - [ ] [T3 Code](https://t3.codes/)
