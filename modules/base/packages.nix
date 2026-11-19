@@ -35,6 +35,7 @@
         fzf
         gawk
         gcc
+        gh
         git
         llmAgents.herdr
         jq
