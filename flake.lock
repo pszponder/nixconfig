@@ -73,6 +73,25 @@
         "type": "github"
       }
     },
+    "helium": {
+      "inputs": {
+        "nixpkgs": [
+          "pflakes",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "path": "./flakes/helium",
+        "type": "path"
+      },
+      "original": {
+        "path": "./flakes/helium",
+        "type": "path"
+      },
+      "parent": [
+        "pflakes"
+      ]
+    },
     "import-tree": {
       "locked": {
         "lastModified": 1788467110,
@@ -173,13 +192,35 @@
         "type": "github"
       }
     },
+    "pflakes": {
+      "inputs": {
+        "helium": "helium",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795068819,
+        "narHash": "sha256-AiZ5e+M6OB53BfKVNj94hQ4IXAm43FaEyfJmra0Gzwg=",
+        "owner": "pszponder",
+        "repo": "pflakes",
+        "rev": "358a67fb917bf504d545233fe4385bb786b9f49f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pszponder",
+        "repo": "pflakes",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-parts": "flake-parts",
         "import-tree": "import-tree",
         "llm-agents": "llm-agents",
         "nixpkgs": "nixpkgs_2",
-        "nixpkgs-stable": "nixpkgs-stable"
+        "nixpkgs-stable": "nixpkgs-stable",
+        "pflakes": "pflakes"
       }
     },
     "systems": {

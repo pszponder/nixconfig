@@ -11,6 +11,11 @@
     # Keep upstream's tested nixpkgs pin for compatibility and binary cache hits.
     llm-agents.url = "github:numtide/llm-agents.nix";
 
+    pflakes = {
+      url = "github:pszponder/pflakes";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Flake parts utils
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";

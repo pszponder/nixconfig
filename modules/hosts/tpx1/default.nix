@@ -1,7 +1,10 @@
 { inputs, self, ... }:
 {
   flake.nixosConfigurations.tpx1 = inputs.nixpkgs.lib.nixosSystem {
-    modules = [ self.modules.nixos.tpx1 ];
+    modules = [
+      self.modules.nixos.tpx1
+      inputs.pflakes.nixosModules.helium
+    ];
   };
 
   flake.modules.nixos.tpx1 = { pkgs, ... }: {
@@ -19,6 +22,8 @@
       printing
       fingerprint
     ];
+
+    programs.helium.enable = true;
 
     boot = {
       loader.systemd-boot.enable = true;
