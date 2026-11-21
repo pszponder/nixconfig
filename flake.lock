@@ -197,14 +197,15 @@
         "helium": "helium",
         "nixpkgs": [
           "nixpkgs"
-        ]
+        ],
+        "zen-browser": "zen-browser"
       },
       "locked": {
-        "lastModified": 1795068819,
-        "narHash": "sha256-AiZ5e+M6OB53BfKVNj94hQ4IXAm43FaEyfJmra0Gzwg=",
+        "lastModified": 1795183664,
+        "narHash": "sha256-g9H2U2lMSrHJd/n5Updp0rR3RXwt2Sm6RdbNnDEWdDs=",
         "owner": "pszponder",
         "repo": "pflakes",
-        "rev": "358a67fb917bf504d545233fe4385bb786b9f49f",
+        "rev": "b794ef46cf4c9b923420fcfbfd6e606f491d9695",
         "type": "github"
       },
       "original": {
@@ -256,6 +257,42 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "zen-browser": {
+      "inputs": {
+        "nixpkgs": [
+          "pflakes",
+          "nixpkgs"
+        ],
+        "zen-packaging": "zen-packaging"
+      },
+      "locked": {
+        "path": "./flakes/zen-browser",
+        "type": "path"
+      },
+      "original": {
+        "path": "./flakes/zen-browser",
+        "type": "path"
+      },
+      "parent": [
+        "pflakes"
+      ]
+    },
+    "zen-packaging": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1795154381,
+        "narHash": "sha256-Q9L3osq3mW1NGCHLESTAsFQKB++50phqtomZE14J0TA=",
+        "owner": "0xc000022070",
+        "repo": "zen-browser-flake",
+        "rev": "1ac6ed0bb28e7e098fa27cf9624b33d74bd4b3bd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "0xc000022070",
+        "repo": "zen-browser-flake",
         "type": "github"
       }
     }

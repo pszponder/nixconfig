@@ -1,8 +1,19 @@
+{ inputs, ... }:
 {
   flake.modules.nixos.desktopPackages =
     { pkgs, ... }:
     {
-      programs.firefox.enable = true;
+      imports = [
+        inputs.pflakes.nixosModules.helium
+        inputs.pflakes.nixosModules.zen-browser
+      ];
+
+      programs = {
+        firefox.enable = true;
+        helium.enable = true;
+        zen-browser.enable = true;
+      };
+
       environment.systemPackages = with pkgs; [
         discord
         flameshot
