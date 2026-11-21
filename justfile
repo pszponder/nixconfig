@@ -3,7 +3,7 @@ set positional-arguments
 
 # Git pathspecs shared by formatting and checking (includes untracked files).
 nix_files := "'*.nix' ':(exclude)modules/hosts/tpx1/_hardware-configuration.nix'"
-prettier_files := "'*.md' '*.json' '*.yaml' '*.yml'"
+oxfmt_files := "'*.md' '*.json' '*.yaml' '*.yml' '*.toml'"
 bash_files := "'*.sh' '*.bash' 'scripts/bootstrap-dotfiles'"
 
 # Match scheduled Nix garbage collection: retain 30 days of generations.
@@ -35,15 +35,13 @@ fingerprint-setup finger="right-index-finger":
 # Format supported tracked and new files, excluding generated files
 fmt:
     git ls-files --cached --others --exclude-standard -z -- {{ nix_files }} | xargs -0 -r nixfmt
-    git ls-files --cached --others --exclude-standard -z -- {{ prettier_files }} | xargs -0 -r prettier --write
-    git ls-files --cached --others --exclude-standard -z -- '*.toml' | xargs -0 -r taplo format
+    git ls-files --cached --others --exclude-standard -z -- {{ oxfmt_files }} | xargs -0 -r oxfmt --write --
     git ls-files --cached --others --exclude-standard -z -- {{ bash_files }} | xargs -0 -r shfmt -ln bash -s -w
 
 # Check formatting without changing files
 fmt-check:
     git ls-files --cached --others --exclude-standard -z -- {{ nix_files }} | xargs -0 -r nixfmt --check
-    git ls-files --cached --others --exclude-standard -z -- {{ prettier_files }} | xargs -0 -r prettier --check
-    git ls-files --cached --others --exclude-standard -z -- '*.toml' | xargs -0 -r taplo format --check
+    git ls-files --cached --others --exclude-standard -z -- {{ oxfmt_files }} | xargs -0 -r oxfmt --check --
     git ls-files --cached --others --exclude-standard -z -- {{ bash_files }} | xargs -0 -r shfmt -ln bash -s -d
 
 # Lint Nix and Bash files, excluding generated files and Zsh scripts
