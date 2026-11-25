@@ -15,11 +15,11 @@ Nix installs applications and manages system configuration. Application dotfiles
 
 ## Choose a command
 
-| What you want to do | Command | What happens to the disk |
-| --- | --- | --- |
-| Update a running NixOS host over SSH | `just deploy HOST USER@TARGET` | Activates a new system generation using the existing filesystems. |
+| What you want to do                                                  | Command                         | What happens to the disk                                                           |
+| -------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
+| Update a running NixOS host over SSH                                 | `just deploy HOST USER@TARGET`  | Activates a new system generation using the existing filesystems.                  |
 | Install on a blank disk, replace Ubuntu, or wipe and reinstall NixOS | `just install HOST USER@TARGET` | **Erases the configured target disk** and creates the host’s declared disk layout. |
-| Rehearse a clean install before touching the target | `just install-test HOST` | Uses a disposable VM disk. |
+| Rehearse a clean install before touching the target                  | `just install-test HOST`        | Uses a disposable VM disk.                                                         |
 
 `HOST` selects the flake configuration. `USER@TARGET` selects the SSH destination. For example, after installing `workstation-vm` and configuring SSH on it, use `just deploy workstation-vm piotr@VM_IP` for subsequent changes. When logged into the installed host, use `just switch`. See the [remote deployment guide](docs/maintenance.md#update-an-existing-nixos-host-over-ssh) for preview and activation options.
 
@@ -102,3 +102,5 @@ just bootstrap-dotfiles /path/to/dotfiles
 ```
 
 The script clones `pszponder/dotfiles` over HTTPS when needed, validates the origin and Stow layout, and runs `just stow` inside the checkout. It does not pull updates or invoke the repository's application installers. The Stow recipe backs up conflicting files under `~/.dotfiles-backup` before creating symlinks. Bootstrap is intentionally separate from system activation.
+
+See the [host-name ideas](docs/hostnames.md) for future machines.

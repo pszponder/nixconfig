@@ -3,7 +3,6 @@
 ## Todos
 
 - [ ] Port things I like about Omarchy to NixOS
-- [ ] Use ai to generate names for pc (ex. mtg planes like Kamigawa)
 - [ ] Configure fingerprint reader on thinkpad
 - [ ] [qutebrowser | qutebrowser](https://qutebrowser.org/)
   - [ ] [Boost Your Productivity with Qutebrowser (Keyboard‑First Browser) on Linux!](https://www.youtube.com/watch?v=_4CWJnCB3To)
@@ -15,6 +14,7 @@
 
 ## Completed Todos
 
+- [x] Use ai to generate names for pc (ex. mtg planes like Kamigawa)
 - [x] Have AI review repos which packages / convert apps to Flakes (ex. like helium from deb) and create a skill using the process
   - [x] [How I Packaged a .deb File (Helium Browser) for NixOS with Flakes | by oxcl | Medium](https://medium.com/@oxcl/how-i-packaged-a-deb-file-for-nixos-with-flakes-ed4e4eb7dbac)
   - [x] Zen Browser
