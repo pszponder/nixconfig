@@ -1,6 +1,6 @@
 # Add a desktop or cloud VM as a NixOS host
 
-For a second desktop that should feel like the ThinkPad, start with `workstation-vm` as a **directory template**. Both hosts import the same [workstation module](../modules/base/workstation.nix), for Piotr's account, base packages, networking, and audio. Each host explicitly selects its desktop session, graphical applications, Docker, and printing. The ThinkPad adds its own disk, drivers, fingerprint reader, and Kanata configuration. Give the desktop its own host directory so future shared changes reach both machines and hardware changes stay local.
+For a second desktop that should feel like the ThinkPad, start with `workstation-vm` as a **directory template**. Both hosts import the same [workstation profile](../modules/profiles/workstation.nix) for the common baseline, development tools, and audio. Set boot, networking, account groups, maintenance, and `system.stateVersion` in the host definition. Each host explicitly selects its desktop session, graphical applications, Docker, and printing. The ThinkPad adds its own disk, drivers, fingerprint reader, and Kanata configuration. Give the desktop its own host directory so future shared changes reach both machines and hardware changes stay local.
 
 ## Desktop walkthrough
 
@@ -55,7 +55,7 @@ For a second desktop that should feel like the ThinkPad, start with `workstation
 
 Provision a disposable instance first. Choose a unique host directory such as `hetzner-web`, `do-dev`, or `ec2-build`. Record the guest architecture, boot mode, root volume identifier, network setup, SSH user, and recovery-console access. A hardware scan describes devices; it doesn't capture the cloud account's network, firewall, or volume settings.
 
-For a **graphical UEFI VM**, follow the desktop steps. Keep the QEMU hardware module only on a compatible guest. For a **headless server**, keep the host-directory pattern and select the services it needs. For example, on a compatible x86_64 UEFI guest where you want interactive LUKS, remove the GNOME, desktop package, web app, Docker and printing imports unless needed. Replace the `workstation` import with `self.modules.nixos.baseConfiguration` and `self.modules.nixos.piotr`, retain the disko module, the host’s `_disk.nix`, and the guest hardware module, and put the following settings beside the host's disk selection:
+For a **graphical UEFI VM**, follow the desktop steps. Keep the QEMU hardware module only on a compatible guest. For a **headless server**, keep the host-directory pattern and select the services it needs. For example, on a compatible x86_64 UEFI guest where you want interactive LUKS, remove the GNOME, desktop package, web app, Docker and printing imports unless needed. Replace the `workstation` import with `self.modules.nixos.common` and keep `self.modules.nixos.piotr` if you want that account. Review the copied NetworkManager, kernel, account groups, and maintenance settings for the server. Retain the disko module, the host’s `_disk.nix`, and the guest hardware module, and put the following settings beside the host's disk selection:
 
 ```nix
 boot.loader.systemd-boot.enable = true;

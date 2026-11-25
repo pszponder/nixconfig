@@ -42,13 +42,17 @@ Most Nix files under `modules/` are Flake Parts modules, discovered by `import-t
 
 Reusable aspects are defined under `flake.modules.<class>.<aspect>`, initially using the `nixos` class. Other Flake Parts modules define outputs such as packages and host configurations.
 
-Aspect names include meaningful directory context: `base/configuration.nix` defines `baseConfiguration`, `base/packages.nix` defines `basePackages`, and `hosts/tpx1/hardware.nix` defines `tpx1Hardware`. A `default.nix` uses the aspect directory name, such as `gnome` or `tpx1`. Organizational directories such as `features` and `users` do not need prefixes: `docker`, `desktopPackages`, and `piotr` already identify their aspects clearly.
+Aspect names include meaningful directory context: `features/common.nix` defines `common`, `profiles/workstation.nix` defines `workstation`, and `hosts/tpx1/hardware.nix` defines `tpx1Hardware`. A `default.nix` uses the aspect directory name, such as `gnome` or `tpx1`. Organizational directories such as `features` and `users` do not need prefixes: `docker`, `desktopPackages`, and `piotr` already identify their aspects clearly.
 
 `parts.nix` imports `inputs.flake-parts.flakeModules.modules` and declares the systems currently supported. Discovering a module registers its definitions; hosts explicitly select which aspects to import.
 
-### modules/base/
+### Shared configuration
 
-A small NixOS baseline and shared package lists. Ordinary applications do not need individual feature modules. Add overlays only when a concrete package customization requires them.
+The `common` module provides Nix defaults and Nerd Fonts for workstations and servers. It imports `commonPackages` from `modules/features/packages.nix` for shared admin tools. Ordinary applications do not need individual feature modules. Add overlays only when a concrete package customization requires them.
+
+### modules/profiles/
+
+The workstation profile imports `common` and `basePackages` and sets up desktop audio. Servers can import `common` directly and select their features.
 
 ### `modules/hosts/<host_name>/`
 
@@ -69,7 +73,7 @@ A collection of Flake Parts modules for features such as GNOME, Docker, and Kana
 
 ### modules/users/
 
-User account definitions, initially `piotr/default.nix`. Piotr is the main user on `tpx1`; this aspect includes `wheel`, `networkmanager`, and `docker` group memberships. A generic multi-user abstraction is not needed for this refactor.
+User account definitions, initially `piotr/default.nix`. Each host selects the account and sets its group memberships. A generic multi-user abstraction is not needed for this refactor.
 
 ## Plan
 

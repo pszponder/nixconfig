@@ -5,7 +5,9 @@ A multi-host dendritic NixOS configuration, inspired by [Renato Garcia's simple 
 `import-tree` discovers Flake Parts modules under `modules/`. Reusable NixOS aspects live under `flake.modules.nixos`; the host explicitly selects its aspects.
 
 - `modules/parts.nix`: module registration and supported systems.
-- `modules/base/`: baseline NixOS settings and CLI packages.
+- `modules/features/common.nix`: shared NixOS settings and Nerd Fonts.
+- `modules/features/packages.nix`: shared admin tools and workstation packages.
+- `modules/profiles/`: reusable host profiles such as the workstation profile.
 - `modules/hosts/`: named host configurations, disk selection, hardware drivers, and host-specific features.
 - `modules/installation/`: installer package and VM installation checks. Each host declares its partitions, filesystems, and mount points in its own `_disk.nix`.
 - `modules/users/piotr/default.nix`: user account.
@@ -68,7 +70,7 @@ For a different graphical or manual installation, first compare `lsblk -o NAME,P
 
 ## Package channels
 
-NixOS and `pkgs` use the pinned `nixos-unstable` input by default. Modules that import `baseConfiguration` can also accept `pkgsStable` as an argument and use, for example, `pkgsStable.hello` to select a package from the pinned stable `nixos-26.05` input. Both package sets use the system's Nixpkgs configuration.
+NixOS and `pkgs` use the pinned `nixos-unstable` input by default. Modules that import `common` can also accept `pkgsStable` as an argument and use, for example, `pkgsStable.hello` to select a package from the pinned stable `nixos-26.05` input. Both package sets use the system's Nixpkgs configuration.
 
 ## Working on the configuration
 
