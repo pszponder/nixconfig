@@ -7,7 +7,7 @@ trap 'rm -f -- "$temporary"' EXIT
 
 # The temporary file belongs to the invoking user; only generation needs root.
 # shellcheck disable=SC2024
-sudo nixos-generate-config --show-hardware-config >"$temporary"
+sudo nixos-generate-config --show-hardware-config --no-filesystems >"$temporary"
 chmod 644 "$temporary"
 mv -- "$temporary" "$destination"
 git diff -- "$destination"

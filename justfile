@@ -2,7 +2,7 @@ set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 set positional-arguments
 
 # Git pathspecs shared by formatting and checking (includes untracked files).
-nix_files := "'*.nix' ':(exclude)modules/hosts/tpx1/_hardware-configuration.nix'"
+nix_files := "'*.nix' ':(exclude)modules/hosts/*/_hardware-configuration.nix'"
 oxfmt_files := "'*.md' '*.json' '*.yaml' '*.yml' '*.toml'"
 bash_files := "'*.sh' '*.bash' 'scripts/bootstrap-dotfiles'"
 
@@ -46,7 +46,7 @@ fmt-check:
 
 # Lint Nix and Bash files, excluding generated files and Zsh scripts
 lint:
-    statix check . --ignore modules/hosts/tpx1/_hardware-configuration.nix
+    statix check . --ignore 'modules/hosts/*/_hardware-configuration.nix'
     git ls-files --cached --others --exclude-standard -z -- {{ nix_files }} | xargs -0 -r deadnix --fail
     git ls-files --cached --others --exclude-standard -z -- {{ bash_files }} | xargs -0 -r shellcheck --shell=bash
 
@@ -82,8 +82,8 @@ test host=`hostname`:
 switch host=`hostname`:
     sudo nixos-rebuild switch --flake .#{{ quote(host) }}
 
-# Deploy over SSH: host target [switch|test|boot|dry-activate] [build-host]
-[confirm("Build and deploy to the specified SSH target? [y/N]")]
+# Update an existing NixOS system over SSH, keeping its disk layout and data
+[confirm("Apply the requested rebuild action to the existing NixOS system over SSH? [y/N]")]
 deploy host target action="switch" build_host="":
     bash scripts/deploy.sh "$1" "$2" "$3" "$4"
 
@@ -117,3 +117,12 @@ gc-preview:
 [confirm("Prune generations older than 30 days and collect garbage? [y/N]")]
 gc:
     sudo nix-collect-garbage {{ gc_args }}
+
+# Test a fresh installation and generation switch on a disposable VM disk
+install-test host=`hostname`:
+    nix build --no-link -L ".#checks.x86_64-linux.${1}-install"
+
+# Clean install over SSH: erase the configured target disk and install NixOS
+[confirm("Erase the configured disk on the SSH target and install NixOS? [y/N]")]
+install host target:
+    nix run .#nixos-anywhere -- --flake ".#$1" --phases kexec,disko,install --target-host "$2"

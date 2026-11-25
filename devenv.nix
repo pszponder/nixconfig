@@ -24,14 +24,14 @@ in
     # llm.codex
   ];
 
-  git-hooks.excludes = [ "^modules/hosts/tpx1/_hardware-configuration\\.nix$" ];
+  git-hooks.excludes = [ "^modules/hosts/[^/]+/_hardware-configuration\\.nix$" ];
   git-hooks.hooks = {
     nixfmt.enable = true;
     statix = {
       enable = true;
       args = [
         "--ignore"
-        "modules/hosts/tpx1/_hardware-configuration.nix"
+        "modules/hosts/*/_hardware-configuration.nix"
       ];
     };
     deadnix.enable = true;

@@ -73,9 +73,9 @@ journalctl -u fprintd.service -b
 
 `fprintd` starts on demand over D-Bus; being inactive when idle is normal. See the [fprintd manual](https://man.archlinux.org/man/fprintd.1.en) and [NixOS GDM integration](https://github.com/NixOS/nixpkgs/blob/d5cc6833999746cffdfe0598f7bc801a57b887a9/nixos/modules/services/display-managers/gdm.nix).
 
-## Future SSH deployments
+## Update an existing NixOS host over SSH
 
-The generic recipe is ready for future hosts; this checkout currently declares only `tpx1`. Its interface is `just deploy HOST TARGET [ACTION] [BUILD_HOST]`. `HOST` selects `nixosConfigurations.HOST`; `TARGET` is a required SSH destination, such as `piotr@server1` or an SSH configuration alias. The default action is `switch` and the default build location is the local machine. All actions ask for confirmation.
+Use this recipe to rebuild an installed NixOS host using its existing filesystems. For a fresh disk layout, follow the [clean installation guide](encrypted-install.md). The deployment command is `just deploy HOST TARGET [ACTION] [BUILD_HOST]`. `HOST` selects `nixosConfigurations.HOST`; `TARGET` is a required SSH destination, such as `piotr@server1` or an SSH configuration alias. The default action is `switch` and the default build location is the local machine. All actions ask for confirmation.
 
 After declaring a real host, use commands like these, replacing the example names:
 
@@ -111,7 +111,7 @@ Before the first deployment:
 
 Remote `test` preserves the old boot default but cannot restore SSH automatically. Consider [deploy-rs](https://github.com/serokell/deploy-rs) when deployments need connectivity confirmation and automatic rollback. Keep a console or other recovery path available for boot and network changes.
 
-For initial installation, consider [nixos-anywhere](https://nix-community.github.io/nixos-anywhere/) with disko when repeatable remote disk provisioning is needed. Installation can erase target disks and should remain a separate operation from this deployment recipe.
+For a fresh installation, follow the [tpx1 disko and nixos-anywhere procedure](../README.md#clean-install-on-tpx1). The install recipe erases the target disk. Use the deployment recipe above for routine updates.
 
 See the upstream [nixos-rebuild command reference](https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/ni/nixos-rebuild-ng/nixos-rebuild.8.scd) for build-host, target-host, and elevation options.
 

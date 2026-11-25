@@ -1,72 +1,70 @@
 # Nix Config
 
-A minimal dendritic NixOS configuration for `tpx1`, inspired by [Renato Garcia's simple dendritic config](https://renatogarcia.blog.br/posts/a-simple-nix-dendritic-config.html).
+A multi-host dendritic NixOS configuration, inspired by [Renato Garcia's simple dendritic config](https://renatogarcia.blog.br/posts/a-simple-nix-dendritic-config.html).
 
 `import-tree` discovers Flake Parts modules under `modules/`. Reusable NixOS aspects live under `flake.modules.nixos`; the host explicitly selects its aspects.
 
 - `modules/parts.nix`: module registration and supported systems.
 - `modules/base/`: baseline NixOS settings and CLI packages.
-- `modules/hosts/tpx1/`: host composition, machine settings, and generated hardware configuration.
+- `modules/hosts/`: named host configurations, disk selection, hardware drivers, and host-specific features.
+- `modules/installation/`: shared UEFI and encrypted storage modules and installation checks.
 - `modules/users/piotr/default.nix`: user account.
 - `modules/features/`: GNOME, desktop packages, Docker, and Kanata.
 
 Nix installs applications and manages system configuration. Application dotfiles belong in [pszponder/dotfiles](https://github.com/pszponder/dotfiles). macOS and Ubuntu configuration are deferred.
 
+## Choose a command
+
+| What you want to do | Command | What happens to the disk |
+| --- | --- | --- |
+| Update a running NixOS host over SSH | `just deploy HOST USER@TARGET` | Activates a new system generation using the existing filesystems. |
+| Install on a blank disk, replace Ubuntu, or wipe and reinstall NixOS | `just install HOST USER@TARGET` | **Erases the configured target disk** and creates the host’s declared disk layout. |
+| Rehearse a clean install before touching the target | `just install-test HOST` | Uses a disposable VM disk. |
+
+`HOST` selects the flake configuration. `USER@TARGET` selects the SSH destination. For example, after installing `workstation-vm` and configuring SSH on it, use `just deploy workstation-vm piotr@VM_IP` for subsequent changes. When logged into the installed host, use `just switch`. See the [remote deployment guide](docs/maintenance.md#update-an-existing-nixos-host-over-ssh) for preview and activation options.
+
+## Install or reinstall a host
+
+To bring up a desktop with the ThinkPad’s software or create a DigitalOcean, Hetzner, or AWS host, start with [Add a desktop or cloud VM](docs/new-host.md).
+
+Follow the [encrypted workstation installation guide](docs/encrypted-install.md) to install from Ubuntu, installed NixOS, or live media. Choose `tpx1-encrypted` for the ThinkPad, `workstation-vm` for a compatible guest, or add a named host with its own disk and hardware module. Use `just install-test HOST` and `just install HOST USER@TARGET` from the same checkout.
+
 ## Clean install on `tpx1`
 
-1. Back up personal files, SSH keys, and any uncommitted changes. Commit and push the configuration you want to install before wiping the machine.
-2. Boot a NixOS installer USB in **UEFI mode** and connect to the internet. Follow the [manual installation guide](https://nixos.org/manual/nixos/stable/#sec-installation-manual) to partition and format the target disk (**this erases its contents**). Mount the root filesystem at `/mnt`, the EFI partition at `/mnt/boot`, and enable swap if used. This repo does not automate disk setup.
-3. Open a root shell with `sudo -i`, then run:
+Run these commands from a second x86_64-linux machine with Nix flakes and just. Use the same checkout for installation and later updates. Stage any new Nix files so the flake can see them. If the controller does not already use the Numtide cache, enable it for this shell before building the desktop configuration:
+
+```sh
+export NIX_CONFIG="extra-substituters = https://cache.numtide.com
+extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
+```
+
+1. Back up the laptop. The install recipe **erases the drive** selected in `modules/hosts/tpx1/hardware.nix`. It creates a 1 GiB EFI partition, ext4 root and about 9 GiB swap. The disk WWN and partition GUIDs match the current laptop. For a replacement disk, verify its whole-disk ID and change the WWN. For another machine, create its own host configuration, disk identifiers and hardware scan.
+2. Run `just install-test tpx1` to exercise the layout, UEFI boot and activation of a second system generation on a disposable VM disk. The test uses a smaller swap reservation to fit its 4 GiB virtual disk.
+3. Boot a NixOS installer USB on the laptop in UEFI mode and connect it to the network. From its console, run `sudo systemctl start sshd` and authorize your controller's SSH key for the live installer user. From the controller, check SSH, passwordless sudo, and the target drive. Replace `INSTALLER_IP` with the live address.
 
    ```sh
-   nix-shell -p git
-   git clone https://github.com/pszponder/nixconfig.git /mnt/etc/nixos
-   cd /mnt/etc/nixos
-   # Check out the branch or commit you want to install before continuing.
-   nixos-generate-config --root /mnt --show-hardware-config > modules/hosts/tpx1/_hardware-configuration.nix
-   nixos-install \
-     --option extra-experimental-features 'nix-command flakes' \
-     --option extra-substituters https://cache.numtide.com \
-     --option extra-trusted-public-keys 'niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=' \
-     --flake .#tpx1
-   nixos-enter --root /mnt --command 'passwd piotr'
-   reboot
+   ssh nixos@INSTALLER_IP 'sudo -n true && lsblk -o NAME,SIZE,MODEL,MOUNTPOINTS && ls -l /dev/disk/by-id/wwn-0x5002538d41d1f7ec'
+   just install tpx1 nixos@INSTALLER_IP
    ```
 
-   Regenerate the hardware file even on the same machine: formatting changes filesystem UUIDs. Keep `system.stateVersion` unchanged. The installer prompts for a root password; the separate `passwd piotr` command enables Piotr's login.
+4. The recipe detects the live installer, runs the disk and installation phases, and leaves the USB environment running. Set the local login password before rebooting, then remove the USB at reboot.
 
-4. Log in as `piotr`, then run `cd /etc/nixos && just bootstrap`. Restore private keys separately and save the regenerated hardware file back to this repository before subsequent rebuilds.
+   ```sh
+   ssh -t nixos@INSTALLER_IP 'sudo nixos-enter --root /mnt --command "passwd piotr"'
+   ssh nixos@INSTALLER_IP 'sudo reboot'
+   ```
 
-## After a graphical installation
+5. Log in locally as `piotr`. Clone the installed revision into `~/repos/github/pszponder/nixconfig`, the location used by scheduled maintenance. Run `just bootstrap` there for dotfiles and restore private keys separately. Use `just switch tpx1` for subsequent changes. Remote updates require configuring SSH access on the installed system as described in [maintenance](docs/maintenance.md).
 
-Install in UEFI mode, create the user `piotr`, and reboot into the installed system. Log in as `piotr`, connect to the internet, then run:
+### Encrypted installation
 
-```sh
-nix-shell -p git just
-mkdir -p ~/repos/github/pszponder
-git clone https://github.com/pszponder/nixconfig.git ~/repos/github/pszponder/nixconfig
-cd ~/repos/github/pszponder/nixconfig
-# Check out the branch or commit you want to apply.
-just bootstrap-hardware tpx1
-```
+Follow the [encrypted reinstall guide](docs/encrypted-install.md) for the ThinkPad or a VM, starting from Ubuntu, installed NixOS, or a live NixOS USB or ISO.
 
-`bootstrap-hardware` requires an explicit existing host, generates its hardware configuration with `sudo nixos-generate-config --show-hardware-config`, and shows the Git diff. It replaces the existing file only after generation succeeds. Run it after booting into the installed system and review the diff before rebuilding. From a live installer, use `--root /mnt` as shown above. `just bootstrap` only sets up dotfiles.
+## Applying the flake to an existing installation
 
-Before rebuilding, compare `/etc/nixos/configuration.nix` with this repo. Preserve any required installer settings, such as encrypted-disk configuration, and use the installed system's `system.stateVersion` in `modules/hosts/tpx1/default.nix`. The installer-created password for `piotr` is retained.
+On the original laptop, the declared partition GUIDs match the existing filesystems. A normal `just switch tpx1` activates a generation without running the disk installer.
 
-```sh
-sudo nixos-rebuild switch \
-  --option extra-experimental-features 'nix-command flakes' \
-  --option extra-substituters https://cache.numtide.com \
-  --option extra-trusted-public-keys 'niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g=' \
-  --flake .#tpx1
-just bootstrap
-sudo reboot
-```
-
-This applies the repo to the existing installation without repartitioning. Save the updated hardware file and any installation-specific changes back to Git. See the [NixOS configuration documentation](https://nixos.org/manual/nixos/stable/#sec-changing-config) for rebuilding and rollback.
-
-Both initial setup commands explicitly enable Numtide's binary cache and signing key so packages from `llm-agents.nix` can download before this configuration is activated. The `extra-` options preserve the default NixOS cache. After activation, `modules/base/configuration.nix` supplies these settings system-wide, so normal builds and updates need no cache flags. Cache settings are kept out of the flake's `nixConfig` to avoid restricted-setting warnings for regular users.
+For a different graphical or manual installation, first compare `lsblk -o NAME,PARTUUID,FSTYPE,MOUNTPOINTS` and the installed boot configuration with the host's disk module. Adapt the host's disk, filesystem and boot declarations to the installed layout before switching. Preserve its `system.stateVersion`. Run `just bootstrap-hardware tpx1` from the installed system to refresh driver detection. It uses `--no-filesystems` because disko supplies mounts and swap. Review the diff before activating. The existing user's password is retained.
 
 ## Package channels
 
