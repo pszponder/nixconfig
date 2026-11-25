@@ -33,9 +33,18 @@ Each target has its own flake output. Keep the host configurations together in t
 
 | Target | Set the host variable on the controller | Disk and hardware |
 | --- | --- | --- |
-| Original ThinkPad | `host=tpx1-encrypted` | Verify the WWN in [the encrypted host hardware module](../modules/hosts/tpx1-encrypted/hardware.nix). |
-| Kamigawa desktop | `host=kamigawa` | Verify the drive WWN in the [host configuration](../modules/hosts/kamigawa/default.nix). |
+| Encrypted ThinkPad | `host=tpx1-encrypted` | `wwn-0x5002538d41d1f7ec` in the [hardware module](../modules/hosts/tpx1-encrypted/hardware.nix). |
+| Kamigawa desktop | `host=kamigawa` | Samsung SSD 870 EVO 4 TB, `wwn-0x5002538f31b2732f` in the [host configuration](../modules/hosts/kamigawa/default.nix). |
 | New machine | `host=office-pc` (choose its actual hostname) | Add a host once using the steps below. |
+
+Verify the configured whole-disk path from the controller. For Kamigawa, run:
+
+```sh
+host=kamigawa
+ssh "$target" 'lsblk -d -o PATH,SIZE,MODEL,WWN && readlink -e /dev/disk/by-id/wwn-0x5002538f31b2732f'
+```
+
+Match the WWN and resolved path to the intended drive. Kamigawa has two Samsung SSDs of the same model and capacity, and Linux can assign different `/dev/sdX` names after a reboot. If you replaced the drive, update the host's configured whole-disk path to the replacement drive's verified ID before proceeding. For an existing configured host, continue to [Build and install](#3-build-and-install).
 
 ### First installation on a new host
 
@@ -73,6 +82,11 @@ From the selected checkout, use an interactive terminal. Apply the controller ca
 ```sh
 just install-test "$host"
 nix build --no-link ".#nixosConfigurations.${host}.config.system.build.toplevel"
+```
+
+After both succeed, start the installation:
+
+```sh
 just install "$host" "$target"
 ```
 
@@ -105,4 +119,4 @@ swapon --show
 hostname
 ```
 
-Expect ext4 on `/dev/mapper/cryptroot` (`tpx1-crypt` on the encrypted ThinkPad), active `/swapfile`, and the selected hostname. Restore the installed repository revision at `~/repos/github/pszponder/nixconfig` for scheduled maintenance. Run `just bootstrap` for dotfiles and `just switch` for normal updates.
+Expect ext4 on the host's encrypted root mapping (`/dev/mapper/kamigawa-crypt` on Kamigawa and `/dev/mapper/tpx1-crypt` on the encrypted ThinkPad), active `/swapfile`, and the selected hostname. Restore the installed repository revision at `~/repos/github/pszponder/nixconfig` for scheduled maintenance. Run `just bootstrap` for dotfiles and `just switch` for normal updates.

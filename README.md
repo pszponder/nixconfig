@@ -26,9 +26,9 @@ Nix installs applications and manages system configuration. Application dotfiles
 
 ## Install or reinstall a host
 
-To set up a headless mini PC or another SSH development machine, start with [Add a remote development host](docs/new-host.md#add-a-remote-development-host). The same guide covers desktops and DigitalOcean, Hetzner, and AWS VMs.
+For a clean install or reinstall of **Kamigawa** or **the encrypted ThinkPad**, start with the [encrypted workstation installation guide](docs/encrypted-install.md). It covers booting the installer, verifying the target drive, running the disposable VM test, installing, and setting the login password before reboot. Use `kamigawa` for the desktop or `tpx1-encrypted` for the ThinkPad.
 
-Follow the [encrypted workstation installation guide](docs/encrypted-install.md) to install from Ubuntu, installed NixOS, or live media. Choose `tpx1-encrypted` for the ThinkPad, `kamigawa` for the desktop, or add a named host with its own disk and hardware module. Use `just install-test HOST` and `just install HOST USER@TARGET` from the same checkout.
+For a new machine, start with [Add a desktop or cloud VM](docs/new-host.md) to give it its own host configuration, disk identifier, and hardware scan. For a headless mini PC or SSH development machine, see [Add a remote development host](docs/new-host.md#add-a-remote-development-host).
 
 ## Clean install on `tpx1`
 
