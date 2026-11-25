@@ -26,7 +26,7 @@ Nix installs applications and manages system configuration. Application dotfiles
 
 ## Install or reinstall a host
 
-To bring up a desktop with the ThinkPad’s software or create a DigitalOcean, Hetzner, or AWS host, start with [Add a desktop or cloud VM](docs/new-host.md).
+To set up a headless mini PC or another SSH development machine, start with [Add a remote development host](docs/new-host.md#add-a-remote-development-host). The same guide covers desktops and DigitalOcean, Hetzner, and AWS VMs.
 
 Follow the [encrypted workstation installation guide](docs/encrypted-install.md) to install from Ubuntu, installed NixOS, or live media. Choose `tpx1-encrypted` for the ThinkPad, `kamigawa` for the desktop, or add a named host with its own disk and hardware module. Use `just install-test HOST` and `just install HOST USER@TARGET` from the same checkout.
 

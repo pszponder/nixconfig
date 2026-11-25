@@ -1,4 +1,52 @@
-# Add a desktop or cloud VM as a NixOS host
+# Add a NixOS host
+
+## Add a remote development host
+
+For an x86_64 UEFI mini PC on your LAN, use a dedicated host directory, wired Ethernet with a DHCP reservation, and SSH key access. Keep project toolchains in each repository’s development shell. For a hosted VM, use the provider-specific boot and storage guidance [below](#creating-a-cloud-host) and reuse the SSH and development setup here.
+
+1. **Boot the installer.** Back up the intended SSD and boot the [NixOS minimal ISO](https://nixos.org/download/) from USB in UEFI mode. At the live console, start SSH with `sudo systemctl start sshd` and put your laptop’s public key in the live user’s `~/.ssh/authorized_keys`. Use `ip -br address` to find the installer IP, then verify access and identify the drive from your laptop:
+
+   ```sh
+   host=devbox
+   target=nixos@INSTALLER_IP
+   ssh "$target" 'sudo -n true && test -d /sys/firmware/efi &&
+     lsblk -o NAME,SIZE,MODEL,SERIAL,TYPE,MOUNTPOINTS &&
+     ls -l /dev/disk/by-id/'
+   ```
+
+2. **Create the host files.** Copy `default.nix` and `_disk.nix` from `kamigawa` into `modules/hosts/devbox/` and generate the new `_hardware-configuration.nix` using the [hardware scan commands](#desktop-walkthrough). Use the verified whole-drive ID in `default.nix`. Keep Disko, the hardware import, and systemd-boot. Replace `workstation` with `common`, keep `piotr`, and remove `desktopPackages`, `webapps`, `gnome`, and `printing`. Keep Docker only if your projects require it. Omit `nixMaintenance` and its settings if you plan to deploy updates from your laptop. Set `system.stateVersion` at first install and retain it on upgrades. For a basic SSH setup with only the `wheel` group, replace the template’s account groups and add:
+
+   ```nix
+   users.users.piotr.extraGroups = [ "wheel" ];
+   users.users.piotr.openssh.authorizedKeys.keys = [
+     "ssh-ed25519 REPLACE_WITH_YOUR_PUBLIC_KEY"
+   ];
+   services.openssh = {
+     enable = true;
+     settings = {
+       PasswordAuthentication = false;
+       KbdInteractiveAuthentication = false;
+       PermitRootLogin = "no";
+     };
+   };
+   environment.systemPackages = [ pkgs.tmux ];
+   ```
+
+3. **Choose how the server boots.** The template’s LUKS layout needs a passphrase at the console before SSH starts. If unattended reboot is required and an unencrypted disk is acceptable, keep the EFI partition, replace the `system` partition’s LUKS content with its inner ext4 filesystem definition, and change its GPT type from `8309` to `8300`. Review the swap size for the available disk space. If you keep LUKS, give the mapper its own name, such as `devbox-crypt`.
+
+4. **Build and verify before installing.** From your laptop, stage the host files and check that the evaluated disk path matches the whole drive you identified:
+
+   ```sh
+   git add -- "modules/hosts/$host"
+   nix eval --raw ".#nixosConfigurations.$host.config.disko.devices.disk.main.device"
+   just build "$host"
+   ```
+
+   If you retained the template’s LUKS layout, run `just install-test "$host"` to rehearse on a disposable VM disk. The repo currently registers a check for that layout and has no generic check for a new unencrypted host. **`just install "$host" "$target"` erases the selected drive.** Run it once the disk and build are verified, then [set Piotr’s login password and boot from the SSD](encrypted-install.md#4-set-the-login-password-and-boot).
+
+5. **Verify access and start developing.** Use the router’s DHCP reservation for a stable LAN address. Connect as `piotr`, run `sudo -v` to verify elevation, and reboot once more to check that the machine is reachable with the chosen unlock procedure. Use [`just deploy devbox piotr@DEVBOX_IP`](maintenance.md#update-an-existing-nixos-host-over-ssh) for later system updates. On the server, clone a project, run `tmux new -s dev`, and enter its shell with `nix develop` if it defines one. For a web app listening on the server’s loopback port 3000, run `ssh -L 3000:localhost:3000 piotr@DEVBOX_IP` from your laptop and open `http://localhost:3000`. For access away from home, use a private VPN and keep SSH off the router’s public port forwards.
+
+## Add a desktop
 
 For a second desktop that should feel like the ThinkPad, start with `kamigawa` as a **directory template**. Both hosts import the same [workstation profile](../modules/features/workstation.nix) for the common baseline, development tools, and audio. Set boot, networking, account groups, maintenance, and `system.stateVersion` in the host definition. Each host explicitly selects its desktop session, graphical applications, Docker, and printing. The ThinkPad adds its own disk, drivers, fingerprint reader, and Kanata configuration. Give the desktop its own host directory so future shared changes reach both machines and hardware changes stay local.
 
