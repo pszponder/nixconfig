@@ -33,7 +33,7 @@ Each target has its own flake output. Keep the host configurations together in t
 
 | Target | Set the host variable on the controller | Disk and hardware |
 | --- | --- | --- |
-| Original ThinkPad | `host=tpx1-encrypted` | Verify the WWN in [the laptop hardware module](../modules/hosts/tpx1/hardware.nix). |
+| Original ThinkPad | `host=tpx1-encrypted` | Verify the WWN in [the encrypted host hardware module](../modules/hosts/tpx1-encrypted/hardware.nix). |
 | x86_64 UEFI QEMU/KVM guest with a virtio disk | `host=workstation-vm` | Verify that the intended guest disk is `/dev/vda`. The [VM host](../modules/hosts/workstation-vm/default.nix) imports guest drivers and the shared workstation configuration. |
 | New machine | `host=office-pc` (choose its actual hostname) | Add a host once using the steps below. |
 
@@ -49,7 +49,7 @@ For a worked desktop example and provider-specific cloud choices, see [Add a des
    mkdir "$host_dir" && cp modules/hosts/workstation-vm/*.nix "$host_dir/"
    ```
 
-2. In the new directory's `default.nix`, set `disko.devices.disk.main.device` to the target's verified whole-disk path, preferably under `/dev/disk/by-id/`. The shared [encrypted layout](../modules/installation/_encrypted-disk.nix) supplies LUKS2, ext4 root and a 9 GiB swap file. Allow space for swap, the desktop system and future generations.
+2. In the new directory's `default.nix`, set `disko.devices.disk.main.device` to the target's verified whole-disk path, preferably under `/dev/disk/by-id/`. The copied [VM disk layout](../modules/hosts/workstation-vm/_disk.nix) supplies LUKS2, ext4 root and a 9 GiB swap file. Allow space for swap, the desktop system and future generations.
 3. Set up the new host's `_hardware-configuration.nix`. Keep the supplied QEMU module for compatible guests. For other machines booted into a NixOS installer or running NixOS, capture and review their hardware scan:
 
    ```sh
@@ -60,7 +60,7 @@ For a worked desktop example and provider-specific cloud choices, see [Add a des
 
    Starting from Ubuntu, you can boot the installer ISO for this scan, or use the pinned installer's hardware-generation option during installation as described below. Disko supplies filesystem declarations, so the scan excludes them.
 
-4. Stage the new directory with `git add -- "$host_dir"`. Review and retain the host configuration, including the final hardware scan, for subsequent reinstalls and updates. Hosts using the shared layout get an install test automatically.
+4. Stage the new directory with `git add -- "$host_dir"`. Review and retain the host configuration, including the final hardware scan, for subsequent reinstalls and updates. The copied layout has an automatic VM check. If you change the filesystem, mount points, or swap strategy, review the assertions in `modules/installation/default.nix` and adapt the test for that host.
 
 The supplied workstation profile uses UEFI, systemd-boot and the packages in this repo. For a different boot scheme, disk topology, or CPU architecture, supply appropriate host modules and a compatible builder. The shipped examples and VM checks target x86_64 Linux.
 

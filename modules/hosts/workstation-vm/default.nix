@@ -11,7 +11,8 @@ in
       self.modules.nixos.gnome
       self.modules.nixos.docker
       self.modules.nixos.printing
-      self.modules.nixos.encryptedRoot
+      inputs.disko.nixosModules.disko
+      ./_disk.nix
       ./_hardware-configuration.nix
       {
         networking.hostName = hostName;

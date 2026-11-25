@@ -7,7 +7,7 @@ A multi-host dendritic NixOS configuration, inspired by [Renato Garcia's simple 
 - `modules/parts.nix`: module registration and supported systems.
 - `modules/base/`: baseline NixOS settings and CLI packages.
 - `modules/hosts/`: named host configurations, disk selection, hardware drivers, and host-specific features.
-- `modules/installation/`: shared UEFI and encrypted storage modules and installation checks.
+- `modules/installation/`: installer package and VM installation checks. Each host declares its partitions, filesystems, and mount points in its own `_disk.nix`.
 - `modules/users/piotr/default.nix`: user account.
 - `modules/features/`: GNOME, desktop packages, Docker, and Kanata.
 
