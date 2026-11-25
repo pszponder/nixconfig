@@ -7,7 +7,6 @@ A multi-host dendritic NixOS configuration, inspired by [Renato Garcia's simple 
 - `modules/parts.nix`: module registration and supported systems.
 - `modules/features/common.nix`: shared NixOS settings and Nerd Fonts.
 - `modules/features/packages.nix`: shared admin tools and workstation packages.
-- `modules/profiles/`: reusable host profiles such as the workstation profile.
 - `modules/hosts/`: named host configurations, disk selection, hardware drivers, and host-specific features.
 - `modules/installation/`: installer package and VM installation checks. Each host declares its partitions, filesystems, and mount points in its own `_disk.nix`.
 - `modules/users/piotr/default.nix`: user account.
@@ -23,13 +22,13 @@ Nix installs applications and manages system configuration. Application dotfiles
 | Install on a blank disk, replace Ubuntu, or wipe and reinstall NixOS | `just install HOST USER@TARGET` | **Erases the configured target disk** and creates the host’s declared disk layout. |
 | Rehearse a clean install before touching the target                  | `just install-test HOST`        | Uses a disposable VM disk.                                                         |
 
-`HOST` selects the flake configuration. `USER@TARGET` selects the SSH destination. For example, after installing `workstation-vm` and configuring SSH on it, use `just deploy workstation-vm piotr@VM_IP` for subsequent changes. When logged into the installed host, use `just switch`. See the [remote deployment guide](docs/maintenance.md#update-an-existing-nixos-host-over-ssh) for preview and activation options.
+`HOST` selects the flake configuration. `USER@TARGET` selects the SSH destination. For example, after installing `kamigawa` and configuring SSH on it, use `just deploy kamigawa piotr@DESKTOP_IP` for subsequent changes. When logged into the installed host, use `just switch`. See the [remote deployment guide](docs/maintenance.md#update-an-existing-nixos-host-over-ssh) for preview and activation options.
 
 ## Install or reinstall a host
 
 To bring up a desktop with the ThinkPad’s software or create a DigitalOcean, Hetzner, or AWS host, start with [Add a desktop or cloud VM](docs/new-host.md).
 
-Follow the [encrypted workstation installation guide](docs/encrypted-install.md) to install from Ubuntu, installed NixOS, or live media. Choose `tpx1-encrypted` for the ThinkPad, `workstation-vm` for a compatible guest, or add a named host with its own disk and hardware module. Use `just install-test HOST` and `just install HOST USER@TARGET` from the same checkout.
+Follow the [encrypted workstation installation guide](docs/encrypted-install.md) to install from Ubuntu, installed NixOS, or live media. Choose `tpx1-encrypted` for the ThinkPad, `kamigawa` for the desktop, or add a named host with its own disk and hardware module. Use `just install-test HOST` and `just install HOST USER@TARGET` from the same checkout.
 
 ## Clean install on `tpx1`
 
@@ -60,7 +59,7 @@ extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc
 
 ### Encrypted installation
 
-Follow the [encrypted reinstall guide](docs/encrypted-install.md) for the ThinkPad or a VM, starting from Ubuntu, installed NixOS, or a live NixOS USB or ISO.
+Follow the [encrypted reinstall guide](docs/encrypted-install.md) for an existing workstation or a new named host, starting from Ubuntu, installed NixOS, or a live NixOS USB or ISO.
 
 ## Applying the flake to an existing installation
 

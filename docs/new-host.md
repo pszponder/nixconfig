@@ -1,6 +1,6 @@
 # Add a desktop or cloud VM as a NixOS host
 
-For a second desktop that should feel like the ThinkPad, start with `workstation-vm` as a **directory template**. Both hosts import the same [workstation profile](../modules/profiles/workstation.nix) for the common baseline, development tools, and audio. Set boot, networking, account groups, maintenance, and `system.stateVersion` in the host definition. Each host explicitly selects its desktop session, graphical applications, Docker, and printing. The ThinkPad adds its own disk, drivers, fingerprint reader, and Kanata configuration. Give the desktop its own host directory so future shared changes reach both machines and hardware changes stay local.
+For a second desktop that should feel like the ThinkPad, start with `kamigawa` as a **directory template**. Both hosts import the same [workstation profile](../modules/features/workstation.nix) for the common baseline, development tools, and audio. Set boot, networking, account groups, maintenance, and `system.stateVersion` in the host definition. Each host explicitly selects its desktop session, graphical applications, Docker, and printing. The ThinkPad adds its own disk, drivers, fingerprint reader, and Kanata configuration. Give the desktop its own host directory so future shared changes reach both machines and hardware changes stay local.
 
 ## Desktop walkthrough
 
@@ -17,15 +17,15 @@ For a second desktop that should feel like the ThinkPad, start with `workstation
 
    ```sh
    host_dir="modules/hosts/$host"
-   mkdir "$host_dir" && cp modules/hosts/workstation-vm/*.nix "$host_dir/"
+   mkdir "$host_dir" && cp modules/hosts/kamigawa/{default,_disk}.nix "$host_dir/"
    scan=$(mktemp)
    ssh "$target" 'sudo -n nixos-generate-config --show-hardware-config --no-filesystems' > "$scan" &&
      test -s "$scan" && cp "$scan" "$host_dir/_hardware-configuration.nix"
    ```
 
-   The scan replaces the template's QEMU guest drivers. Disko declares the filesystems. If the machine is running Ubuntu and you prefer to install directly over SSH, the [installer walkthrough](encrypted-install.md#3-build-and-install) includes hardware generation during the transition to the temporary installer.
+   The scan supplies the new host’s hardware configuration. Disko declares the filesystems. If the machine is running Ubuntu and you prefer to install directly over SSH, the [installer walkthrough](encrypted-install.md#3-build-and-install) includes hardware generation during the transition to the temporary installer.
 
-3. **Edit the new host's `default.nix`.** Replace `/dev/vda` with the verified whole-drive path, such as `/dev/disk/by-id/…`. Review the new host’s `_disk.nix` for its partition sizes, encryption, filesystems, and mount points. Add desktop-only settings in the existing module block beside `networking.hostName`. For example, enable SSH there if you want to update the machine remotely. Replace the example text with the complete contents of your controller's public key file:
+3. **Edit the new host's `default.nix`.** Replace Kamigawa’s disk identifier with the verified whole-drive path, such as `/dev/disk/by-id/…`. Review the new host’s `_disk.nix` for its partition sizes, encryption, filesystems, and mount points. Add desktop-only settings in the existing module block beside `networking.hostName`. For example, enable SSH there if you want to update the machine remotely. Replace the example text with the complete contents of your controller's public key file:
 
    ```nix
    services.openssh.enable = true;
@@ -55,7 +55,7 @@ For a second desktop that should feel like the ThinkPad, start with `workstation
 
 Provision a disposable instance first. Choose a unique host directory such as `hetzner-web`, `do-dev`, or `ec2-build`. Record the guest architecture, boot mode, root volume identifier, network setup, SSH user, and recovery-console access. A hardware scan describes devices; it doesn't capture the cloud account's network, firewall, or volume settings.
 
-For a **graphical UEFI VM**, follow the desktop steps. Keep the QEMU hardware module only on a compatible guest. For a **headless server**, keep the host-directory pattern and select the services it needs. For example, on a compatible x86_64 UEFI guest where you want interactive LUKS, remove the GNOME, desktop package, web app, Docker and printing imports unless needed. Replace the `workstation` import with `self.modules.nixos.common` and keep `self.modules.nixos.piotr` if you want that account. Review the copied NetworkManager, kernel, account groups, and maintenance settings for the server. Retain the disko module, the host’s `_disk.nix`, and the guest hardware module, and put the following settings beside the host's disk selection:
+For a **graphical UEFI VM**, follow the desktop steps. Generate the hardware configuration inside the guest. For a **headless server**, keep the host-directory pattern and select the services it needs. For example, on a compatible x86_64 UEFI guest where you want interactive LUKS, remove the GNOME, desktop package, web app, Docker and printing imports unless needed. Replace the `workstation` import with `self.modules.nixos.common` and keep `self.modules.nixos.piotr` if you want that account. Review the copied NetworkManager, kernel, account groups, and maintenance settings for the server. Retain the disko module, the host’s `_disk.nix`, and the guest hardware module, and put the following settings beside the host's disk selection:
 
 ```nix
 boot.loader.systemd-boot.enable = true;
@@ -66,7 +66,7 @@ users.users.piotr.openssh.authorizedKeys.keys = [
 system.stateVersion = "26.05"; # Choose at first install and retain on upgrades.
 ```
 
-Set up the instance's required networking and allow SSH from the controller in the provider firewall. For UEFI, verify how the guest persists boot entries and whether it needs the removable-media boot path. For legacy BIOS, supply a BIOS-compatible disko layout and bootloader, such as GPT with a BIOS boot partition and GRUB. The sample VM disk layout and its VM check assume UEFI. The supplied checks run on x86_64 Linux; ARM instances need an appropriate configuration and builder.
+Set up the instance's required networking and allow SSH from the controller in the provider firewall. For UEFI, verify how the guest persists boot entries and whether it needs the removable-media boot path. For legacy BIOS, supply a BIOS-compatible disko layout and bootloader, such as GPT with a BIOS boot partition and GRUB. The sample disk layout and its VM check assume UEFI. The supplied checks run on x86_64 Linux; ARM instances need an appropriate configuration and builder.
 
 **Decide how the VM will unlock after a reboot.** The sample LUKS layout prompts before ordinary SSH starts. Verify that you can see and type at the early boot prompt through the provider console. If you need unattended reboot, choose a suitable storage and unlock policy before installing. On EC2, encrypted EBS is one option when provider-managed encryption meets your requirements. [AWS EBS encryption](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-encryption.html)
 
