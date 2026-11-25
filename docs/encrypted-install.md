@@ -2,7 +2,56 @@
 
 For routine configuration changes on an installed NixOS host, use `just deploy HOST USER@TARGET`. Continue below when you intend to erase the configured target disk. See [remote deployment](maintenance.md#update-an-existing-nixos-host-over-ssh).
 
-Run the commands from a second x86_64 Linux machine with Nix flakes, just, and this repository. The controller can be the computer hosting the VM. The target is the laptop or VM whose disk you intend to erase. **Back up the target or take a VM snapshot before installing.** A clean install replaces the OS, existing encryption keys, user accounts and data on the selected disk.
+**Back up the target or take a VM snapshot before installing.** A clean install replaces the OS, existing encryption keys, user accounts and data on the selected disk.
+
+You can [install directly from a NixOS USB](#install-directly-from-a-nixos-usb) with a copy of this repository. For the SSH workflow in steps 1–4, run the controller commands from a second x86_64 Linux machine with Nix flakes, just, and the repository. The controller can be the computer hosting the VM.
+
+## Connect the live installer to the internet
+
+Boot the NixOS USB or ISO in UEFI mode. For Ethernet, plug into your router and wait for DHCP. For Wi-Fi, select the network in the graphical installer’s system menu or run `sudo nmtui`, choose **Activate a connection**, and enter the Wi-Fi password.
+
+```sh
+ip -br address
+curl -fsSL https://cache.nixos.org/nix-cache-info
+```
+
+The first command shows the installer’s IP address for SSH. The second checks that the installer can reach the Nix binary cache. See [Networking in the NixOS installer](https://nixos.org/manual/nixos/stable/#sec-installation-manual-networking).
+
+## Install directly from a NixOS USB
+
+Use this path for a host already configured in the repo. After connecting the live installer, clone or extract the repository revision that contains your host, or copy a checkout from another USB drive. For a private repository, bring a copy or use an authenticated download. The checkout contains the configuration and lock file. The live installer still needs internet access to fetch the flake inputs and packages.
+
+1. Open a terminal in the checkout and confirm that you booted in UEFI mode. For Kamigawa, use the commands below. For another configured host, substitute its name and configured disk path from [the host table](#2-select-or-add-a-host).
+
+   ```sh
+   host=kamigawa
+   test -d /sys/firmware/efi && echo UEFI
+   lsblk -d -o PATH,SIZE,MODEL,WWN
+   readlink -e /dev/disk/by-id/wwn-0x5002538f31b2732f
+   ```
+
+2. Verify that the configured WWN resolves to the intended drive. Build the system before erasing the disk:
+
+   ```sh
+   nix --extra-experimental-features 'nix-command flakes' build --no-link \
+     ".#nixosConfigurations.${host}.config.system.build.toplevel"
+   ```
+
+3. After the build succeeds, run Disko from the repository’s pinned input. **This erases the configured disk.** Enter the LUKS passphrase when prompted. Disko mounts the new filesystems under `/mnt`.
+
+   ```sh
+   sudo nix --extra-experimental-features 'nix-command flakes' run --inputs-from . disko -- \
+     --mode destroy,format,mount --flake ".#$host"
+   ```
+
+4. After Disko succeeds, install the system and set the local login password:
+
+   ```sh
+   sudo nixos-install --flake ".#$host" --no-root-passwd &&
+     sudo nixos-enter --root /mnt --command "passwd piotr"
+   ```
+
+   Reboot, remove the USB, and unlock the installed system with the LUKS passphrase. Log in as `piotr` and follow the checks and repository restore steps under [Set the login password and boot](#4-set-the-login-password-and-boot).
 
 ## 1. Connect to the target
 
@@ -84,7 +133,7 @@ just install-test "$host"
 nix build --no-link ".#nixosConfigurations.${host}.config.system.build.toplevel"
 ```
 
-After both succeed, start the installation:
+After both checks pass, choose one installation command. **Either command erases the selected drive.** For a host with a hardware scan already in the checkout, run the install recipe and confirm when prompted.
 
 ```sh
 just install "$host" "$target"
@@ -98,7 +147,7 @@ nix run .#nixos-anywhere -- --flake ".#$host" --target-host "$target" \
   --generate-hardware-config nixos-generate-config "$host_dir/_hardware-configuration.nix"
 ```
 
-The first command exercises installation and a generation switch on a disposable VM disk. The last command asks for confirmation, enters the installer if needed, **erases the selected target disk**, and prompts twice for the LUKS passphrase. Keep a recovery copy of that passphrase. The EFI partition is unencrypted. Root and the swap file live inside LUKS2.
+During disk setup, enter the new LUKS passphrase twice. Keep a recovery copy of that passphrase. The EFI partition is unencrypted. Root and the swap file live inside LUKS2.
 
 ## 4. Set the login password and boot
 

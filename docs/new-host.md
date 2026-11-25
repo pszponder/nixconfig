@@ -4,7 +4,7 @@
 
 For an x86_64 UEFI mini PC on your LAN, use a dedicated host directory, wired Ethernet with a DHCP reservation, and SSH key access. Keep project toolchains in each repository’s development shell. For a hosted VM, use the provider-specific boot and storage guidance [below](#creating-a-cloud-host) and reuse the SSH and development setup here.
 
-1. **Boot the installer.** Back up the intended SSD and boot the [NixOS minimal ISO](https://nixos.org/download/) from USB in UEFI mode. At the live console, start SSH with `sudo systemctl start sshd` and put your laptop’s public key in the live user’s `~/.ssh/authorized_keys`. Use `ip -br address` to find the installer IP, then verify access and identify the drive from your laptop:
+1. **Boot the installer.** Back up the intended SSD and boot the [NixOS minimal ISO](https://nixos.org/download/) from USB in UEFI mode. At the live console, start SSH with `sudo systemctl start sshd` and put your laptop’s public key in the live user’s `~/.ssh/authorized_keys`. Use `ip -br address` to find the installer IP, then verify access and identify the drive from your laptop. Replace `INSTALLER_IP` with the address shown at the console.
 
    ```sh
    host=devbox

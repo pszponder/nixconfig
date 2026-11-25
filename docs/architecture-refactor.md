@@ -10,7 +10,9 @@
 
 The immediate target is a working machine with a small, understandable configuration. Preserving every wrapper-provided convenience is outside the scope of this refactor.
 
-## New file structure
+## Originally proposed file structure
+
+The [README](../README.md) describes the current module layout.
 
 Inspired by [Renato Garcia - A Simple Nix Dendritic Config](https://renatogarcia.blog.br/posts/a-simple-nix-dendritic-config.html)
 

@@ -28,6 +28,8 @@ Nix installs applications and manages system configuration. Application dotfiles
 
 For a clean install or reinstall of **Kamigawa** or **the encrypted ThinkPad**, start with the [encrypted workstation installation guide](docs/encrypted-install.md). It covers booting the installer, verifying the target drive, running the disposable VM test, installing, and setting the login password before reboot. Use `kamigawa` for the desktop or `tpx1-encrypted` for the ThinkPad.
 
+You can also [install directly from a NixOS USB](docs/encrypted-install.md#install-directly-from-a-nixos-usb) with internet access and a copy of this repository.
+
 For a new machine, start with [Add a desktop or cloud VM](docs/new-host.md) to give it its own host configuration, disk identifier, and hardware scan. For a headless mini PC or SSH development machine, see [Add a remote development host](docs/new-host.md#add-a-remote-development-host).
 
 ## Clean install on `tpx1`
@@ -45,17 +47,22 @@ extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc
 
    ```sh
    ssh nixos@INSTALLER_IP 'sudo -n true && lsblk -o NAME,SIZE,MODEL,MOUNTPOINTS && ls -l /dev/disk/by-id/wwn-0x5002538d41d1f7ec'
+   ```
+
+4. Match the whole-disk ID above to the model and size of the drive you backed up. Once you confirm the match, start the install. **This erases that drive.**
+
+   ```sh
    just install tpx1 nixos@INSTALLER_IP
    ```
 
-4. The recipe detects the live installer, runs the disk and installation phases, and leaves the USB environment running. Set the local login password before rebooting, then remove the USB at reboot.
+5. The recipe detects the live installer, runs the disk and installation phases, and leaves the USB environment running. Set the local login password before rebooting, then remove the USB at reboot.
 
    ```sh
    ssh -t nixos@INSTALLER_IP 'sudo nixos-enter --root /mnt --command "passwd piotr"'
    ssh nixos@INSTALLER_IP 'sudo reboot'
    ```
 
-5. Log in locally as `piotr`. Clone the installed revision into `~/repos/github/pszponder/nixconfig`, the location used by scheduled maintenance. Run `just bootstrap` there for dotfiles and restore private keys separately. Use `just switch tpx1` for subsequent changes. Remote updates require configuring SSH access on the installed system as described in [maintenance](docs/maintenance.md).
+6. Log in locally as `piotr`. Clone the installed revision into `~/repos/github/pszponder/nixconfig`, the location used by scheduled maintenance. Run `just bootstrap` there for dotfiles and restore private keys separately. Use `just switch tpx1` for subsequent changes. Remote updates require configuring SSH access on the installed system as described in [maintenance](docs/maintenance.md).
 
 ### Encrypted installation
 
@@ -79,14 +86,14 @@ After setting up your GitHub SSH key, switch an HTTPS clone's origin to SSH:
 just remote-ssh
 ```
 
-Enter the development environment with `devenv shell`, then run:
+Enter the development environment with `devenv shell`. If you created any Nix files, review them and stage them with Git so the flake can see them. Then validate and build the host.
 
 ```sh
 just validate
 just build tpx1
 ```
 
-New Nix files must be added to Git before Git-backed flake commands can see them. Review and stage the refactor before running these commands. For an unstaged working-tree check, use `nix flake check path:.` and `nix build path:.#nixosConfigurations.tpx1.config.system.build.toplevel`.
+For an unstaged working-tree check, use `nix flake check path:.` and `nix build path:.#nixosConfigurations.tpx1.config.system.build.toplevel`.
 
 After reviewing the build, activate with `just switch tpx1`. The hardware file and `system.stateVersion` retain their existing values.
 
