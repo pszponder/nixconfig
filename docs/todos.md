@@ -3,14 +3,7 @@
 ## Todos
 
 - [ ] Port things I like about Omarchy to NixOS
-- [ ] Have AI review repos which packages / convert apps to Flakes (ex. like helium from deb) and create a skill using the process
-  - [ ] [How I Packaged a .deb File (Helium Browser) for NixOS with Flakes | by oxcl | Medium](https://medium.com/@oxcl/how-i-packaged-a-deb-file-for-nixos-with-flakes-ed4e4eb7dbac)
-  - [ ] Zen Browser
-  - [ ] Helium Browser
-  - [ ] [T3 Code](https://t3.codes/)
-    - [ ] [T3 Code broke me](https://www.youtube.com/watch?v=uLGxb4F3SyI)
-    - [ ] [ominit/t3code-flake](https://github.com/ominit/t3code-flake)
-- [ ] Use ai go generate names for pc (ex. mtg planes like Kamigawa)
+- [ ] Use ai to generate names for pc (ex. mtg planes like Kamigawa)
 - [ ] Configure fingerprint reader on thinkpad
 - [ ] [qutebrowser | qutebrowser](https://qutebrowser.org/)
   - [ ] [Boost Your Productivity with Qutebrowser (Keyboard‑First Browser) on Linux!](https://www.youtube.com/watch?v=_4CWJnCB3To)
@@ -18,9 +11,17 @@
 - [ ] add tmux
 - [ ] add herdr
 - [ ] add custom nvim configurations
+- [ ] Figure out how to use disko and nixos-anywhere to make my configuration portable and easy to setup / reinstall
 
 ## Completed Todos
 
+- [x] Have AI review repos which packages / convert apps to Flakes (ex. like helium from deb) and create a skill using the process
+  - [x] [How I Packaged a .deb File (Helium Browser) for NixOS with Flakes | by oxcl | Medium](https://medium.com/@oxcl/how-i-packaged-a-deb-file-for-nixos-with-flakes-ed4e4eb7dbac)
+  - [x] Zen Browser
+  - [x] Helium Browser
+  - [x] [T3 Code](https://t3.codes/)
+    - [x] [T3 Code broke me](https://www.youtube.com/watch?v=uLGxb4F3SyI)
+    - [x] [ominit/t3code-flake](https://github.com/ominit/t3code-flake)
 - [x] [Review ryan4yin's Justfile](maintenance.md#justfile-review)
 - [x] Investigate how to create web apps in nix (how does omarchy do it and how to adapt to nix)
 - [x] configure printer?

@@ -21,6 +21,7 @@
         google-chrome
         libreoffice
         obsidian
+        t3code
         vscode
         wl-clipboard
         zed-editor
