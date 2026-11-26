@@ -6,6 +6,7 @@
       imports = with self.modules.nixos; [
         workstation
         piotr
+        encryptedAutologin
         nixMaintenance
         desktopPackages
         webapps
