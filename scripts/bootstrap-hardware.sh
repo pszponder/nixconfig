@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-destination="modules/hosts/${1:?Usage: bootstrap-hardware.sh HOST}/_hardware-configuration.nix"
+host=${1:?Usage: bootstrap-hardware.sh HOST}
+# Both ThinkPad layouts import the same physical hardware scan.
+[[ $host != tpx1-encrypted ]] || host=tpx1
+destination="modules/hosts/$host/_hardware-configuration.nix"
 temporary=$(mktemp "${destination}.XXXXXX")
 trap 'rm -f -- "$temporary"' EXIT
 

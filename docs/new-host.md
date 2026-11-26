@@ -50,7 +50,7 @@ For an x86_64 UEFI mini PC on your LAN, use a dedicated host directory, wired Et
    just build "$host"
    ```
 
-   For the template’s LUKS layout, run `just install-test "$host"` to rehearse on a disposable VM disk. **`just install "$host" "$target"` erases the selected drive.** Run it after the build and the [remote disk and headless access checks](install.md#verify-the-selected-disk) succeed, then [set Piotr’s login password and boot from the SSD](install.md#4-set-the-login-password-and-boot).
+   Add the host to `testLayouts` in [the install checks](../modules/install.nix). For the template’s LUKS layout, select `encrypted` and run `just install-test "$host"` to rehearse on a disposable VM disk. **`just install "$host" "$target"` erases the selected drive.** Run it after the build and the [remote disk and headless access checks](install.md#verify-the-selected-disk) succeed, then [set Piotr’s login password and boot from the SSD](install.md#4-set-the-login-password-and-boot).
 
 5. **Verify access and start developing.** Use the router’s DHCP reservation for a stable LAN address. Connect as `piotr`, run `sudo -v` to verify elevation, and reboot once more to check that the machine is reachable with the chosen unlock procedure. Use [`just deploy devbox piotr@DEVBOX_IP`](maintenance.md#update-an-existing-nixos-host-over-ssh) for later system updates. On the server, clone a project, run `tmux new -s dev`, and enter its shell with `nix develop` if it defines one. For a web app listening on the server’s loopback port 3000, run `ssh -L 3000:localhost:3000 piotr@DEVBOX_IP` from your laptop and open `http://localhost:3000`. For access away from home, use a private VPN and keep SSH off the router’s public port forwards.
 
@@ -94,7 +94,7 @@ For a second desktop that should feel like the ThinkPad, start with `kamigawa` a
 
    Review the generated drivers and add settings for peripherals that actually exist, such as a discrete GPU requiring a particular driver. To change a feature for both desktops, edit the module they both import. To change only this desktop, edit its host directory.
 
-4. **Verify the selection before installing.** Stage the new files so Nix can see them. Compare the evaluated device with the disk you identified in step 1. The VM test exercises formatting, LUKS unlock, boot and a generation switch. Physical GPU, network and peripheral support need a check on the actual desktop.
+4. **Verify the selection before installing.** Add the host to `testLayouts` in [the install checks](../modules/install.nix), using `encrypted` for the template layout. Stage the new files so Nix can see them. Compare the evaluated device with the disk you identified in step 1. The VM test exercises formatting, LUKS unlock, boot and a generation switch. Physical GPU, network and peripheral support need a check on the actual desktop.
 
    ```sh
    git add -- "$host_dir"
@@ -105,7 +105,7 @@ For a second desktop that should feel like the ThinkPad, start with `kamigawa` a
 
 5. **Install, then set the login password.** Complete the [remote disk check](install.md#verify-the-selected-disk) and, for SSH-managed machines, the headless access check below it. From an interactive terminal run `just install "$host" "$target"`. **This erases the selected drive.** Enter the new LUKS passphrase when prompted. With the installer still running, set Piotr's login password, reboot from the drive, and unlock it at the desktop console. The [first-boot instructions](install.md#4-set-the-login-password-and-boot) include the commands for USB and kexec installations.
 
-6. Save the host configuration in Git and restore the checkout at `~/repos/github/pszponder/nixconfig` on the installed desktop for scheduled maintenance. Use `just switch` locally or `just deploy new-host piotr@DESKTOP_IP` remotely for later changes. Use `just install` again only for a deliberate clean reinstall.
+6. Save the host configuration in Git and restore the checkout at `~/repos/github/pszponder/nixconfig` on the installed desktop for manual updates. Use `just switch` locally or `just deploy new-host piotr@DESKTOP_IP` remotely for later changes. Use `just install` again only for a deliberate clean reinstall.
 
 ## Creating a cloud host
 

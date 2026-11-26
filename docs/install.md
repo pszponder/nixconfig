@@ -114,7 +114,7 @@ Each target has its own flake output. Keep the host configurations together in t
 | Target                         | Set the host variable on the controller       | Disk and hardware                                                                                                      |
 | ------------------------------ | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | ThinkPad with unencrypted root | `host=tpx1`                                   | Same physical SSD as the encrypted variant.                                                                            |
-| Encrypted ThinkPad             | `host=tpx1-encrypted`                         | `wwn-0x5002538d41d1f7ec` in the [hardware module](../modules/hosts/tpx1-encrypted/hardware.nix).                       |
+| Encrypted ThinkPad             | `host=tpx1-encrypted`                         | `wwn-0x5002538d41d1f7ec` in the [hardware module](../modules/hosts/tpx1/hardware.nix).                                 |
 | Kamigawa desktop               | `host=kamigawa`                               | Samsung SSD 870 EVO 4 TB, `wwn-0x5002538f31b2732f` in the [host configuration](../modules/hosts/kamigawa/default.nix). |
 | New machine                    | `host=office-pc` (choose its actual hostname) | Add a host once using the steps below.                                                                                 |
 
@@ -208,4 +208,4 @@ swapon --show
 hostname
 ```
 
-For plain tpx1, expect ext4 root and a swap partition. For the encrypted workstations, expect ext4 on the host's encrypted root mapping (`/dev/mapper/kamigawa-crypt` on Kamigawa and `/dev/mapper/tpx1-crypt` on the encrypted ThinkPad), active `/swapfile`, and the selected hostname. Restore the installed repository revision at `~/repos/github/pszponder/nixconfig` for scheduled maintenance. Run `just bootstrap` for dotfiles and `just switch` for normal updates.
+For plain tpx1, expect ext4 root and a swap partition. For the encrypted workstations, expect ext4 on the host's encrypted root mapping (`/dev/mapper/kamigawa-crypt` on Kamigawa and `/dev/mapper/tpx1-crypt` on the encrypted ThinkPad), active `/swapfile`, and the selected hostname. Restore the installed repository revision at `~/repos/github/pszponder/nixconfig` for manual updates. Run `just bootstrap` for dotfiles and `just switch` for normal updates.

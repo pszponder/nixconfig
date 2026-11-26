@@ -79,6 +79,5 @@ in
 
   enterShell = ''
     echo "NixOS configuration development environment"
-    echo "Codex is available as 'codex'."
   '';
 }

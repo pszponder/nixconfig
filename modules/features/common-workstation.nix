@@ -19,6 +19,6 @@
         kernelPackages = pkgs.linuxPackages_latest;
       };
       networking.networkmanager.enable = true;
-      system.autoUpgrade.flake = "/home/piotr/repos/github/pszponder/nixconfig";
+      # system.autoUpgrade.flake = "/home/piotr/repos/github/pszponder/nixconfig";
     };
 }

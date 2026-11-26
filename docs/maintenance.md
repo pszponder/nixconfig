@@ -143,9 +143,7 @@ Inspect the scheduled cleanup with `systemctl status nix-gc.timer` and `journalc
 
 ## Automatic upgrades
 
-The standard NixOS `system.autoUpgrade` service runs Sundays at 18:00 with up to 45 minutes of random delay. It updates the `nixpkgs` flake input, rebuilds, and activates without automatic reboot. Other inputs remain pinned. The job writes `flake.lock` in the configured checkout without committing or pushing it; review and commit that diff afterward. If the build fails, the lockfile may still contain the updated pin. Cleanup runs separately through `nix-gc.service`.
-
-Inspect upgrades with `systemctl status nixos-upgrade.timer` and `journalctl -u nixos-upgrade.service`.
+Unattended system upgrades are disabled. Run `just up HOST` from the checkout to update the flake inputs and activate the new system. Weekly garbage collection runs independently.
 
 ## Resources / References
 

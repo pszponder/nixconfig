@@ -34,55 +34,58 @@ in
       system,
       ...
     }:
+    let
+      plain = _: {
+        # disko's test VM supplies a sparse 4 GiB disk.
+        disko.devices.disk.main.content.partitions.root.end = lib.mkForce "-512M";
+      };
+      encrypted =
+        host:
+        let
+          mapper = host.config.disko.devices.disk.main.content.partitions.system.content.name;
+        in
+        {
+          swapDevices = lib.mkForce [
+            {
+              device = "/swapfile";
+              size = 256;
+            }
+          ];
+          disko = {
+            # The disko test installer creates this fixture on its temporary root.
+            devices.disk.main.content.partitions.system.content.passwordFile = "/tmp/secret.key";
+            tests = {
+              enableOCR = true;
+              bootCommands = ''
+                machine.wait_for_text("[Pp]assphrase")
+                machine.send_chars("secretsecret\n")
+              '';
+              extraChecks = lib.mkAfter ''
+                machine.succeed("cryptsetup status ${mapper} | grep -iw LUKS2")
+                machine.succeed("test $(findmnt -no MAJ:MIN /) = $(lsblk -dnro MAJ:MIN /dev/mapper/${mapper})")
+                machine.succeed("test $(swapon --noheadings --show=NAME) = /swapfile && test $(findmnt -no TARGET -T /swapfile) = /")
+              '';
+            };
+          };
+        };
+      testLayouts = {
+        kamigawa = encrypted;
+        tpx1 = plain;
+        tpx1-encrypted = encrypted;
+      };
+      hosts = lib.filterAttrs (
+        _: host: host.pkgs.stdenv.hostPlatform.system == system
+      ) self.nixosConfigurations;
+      missing = lib.subtractLists (builtins.attrNames testLayouts) (builtins.attrNames hosts);
+    in
     {
       packages.nixos-anywhere = pkgs.nixos-anywhere;
       checks =
-        lib.optionalAttrs (self.nixosConfigurations ? tpx1) {
-          # disko's test VM supplies a sparse 4 GiB disk and shares the Nix store.
-          tpx1-install = installTest self.nixosConfigurations.tpx1 {
-            disko.devices.disk.main.content.partitions.root.end = lib.mkForce "-512M";
-          };
-        }
-        //
-          lib.mapAttrs'
-            (
-              name: host:
-              let
-                mapper = host.config.disko.devices.disk.main.content.partitions.system.content.name;
-              in
-              lib.nameValuePair "${name}-install" (
-                installTest host {
-                  swapDevices = lib.mkForce [
-                    {
-                      device = "/swapfile";
-                      size = 256;
-                    }
-                  ];
-                  disko = {
-                    # The disko test installer creates this fixture on its temporary root.
-                    devices.disk.main.content.partitions.system.content.passwordFile = "/tmp/secret.key";
-                    tests = {
-                      enableOCR = true;
-                      bootCommands = ''
-                        machine.wait_for_text("[Pp]assphrase")
-                        machine.send_chars("secretsecret\n")
-                      '';
-                      extraChecks = lib.mkAfter ''
-                        machine.succeed("cryptsetup status ${mapper} | grep -iw LUKS2")
-                        machine.succeed("test $(findmnt -no MAJ:MIN /) = $(lsblk -dnro MAJ:MIN /dev/mapper/${mapper})")
-                        machine.succeed("test $(swapon --noheadings --show=NAME) = /swapfile && test $(findmnt -no TARGET -T /swapfile) = /")
-                      '';
-                    };
-                  };
-                }
-              )
-            )
-            (
-              lib.filterAttrs (
-                _: host:
-                host.pkgs.stdenv.hostPlatform.system == system
-                && (host.config.disko.devices.disk.main.content.partitions.system.content.type or null) == "luks"
-              ) self.nixosConfigurations
-            );
+        assert lib.assertMsg (
+          missing == [ ]
+        ) "Choose an install test layout in modules/install.nix for: ${lib.concatStringsSep ", " missing}";
+        lib.mapAttrs' (
+          name: host: lib.nameValuePair "${name}-install" (installTest host (testLayouts.${name} host))
+        ) hosts;
     };
 }

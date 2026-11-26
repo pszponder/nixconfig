@@ -4,7 +4,7 @@
     modules = with self.modules.nixos; [
       workstationCommon
       gnome
-      tpx1EncryptedHardware
+      tpx1Hardware
       kanata
       fingerprint
       inputs.disko.nixosModules.disko
