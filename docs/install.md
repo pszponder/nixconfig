@@ -42,7 +42,7 @@ Look for a connected Ethernet or Wi-Fi device and a response containing `StoreDi
 
    Make sure you are on the desired branch.
 
-2. **Optional: look up the host and verify its configured disk.** If you already know the host name and have confirmed which physical drive its configuration selects, skip this step and pass the host name directly to the shortcut in step 3. Use the commands below if you need to look up the host or verify the disk, especially after changing the disk configuration. This example selects Kamigawa.
+2. **Optional: look up the host and verify its configured disk.** If you already know the host name and have confirmed which physical drive its configuration selects, skip this step and pass the host name directly to the install-local recipe. Use the commands below if you need to look up the host or verify the disk, especially after changing the disk configuration. This example selects Kamigawa.
 
    ```sh
    # List the host configurations in this checkout.
@@ -67,43 +67,58 @@ Look for a connected Ethernet or Wi-Fi device and a response containing `StoreDi
 
    Match the resolved path, model, and serial or WWN to the whole drive you backed up. If the path is missing or identifies another drive, stop here. Both ThinkPad variants select the same SSD. Use `tpx1` for a fresh encrypted ThinkPad install. The `tpx1-unencrypted` output describes the existing plain ext4 layout.
 
-3. **Build and install.** Choose the shortcut or the manual commands below. Both erase the disk selected by the host configuration.
+From the checkout, choose one installation method. Both erase the selected disk before building the full system in its Nix store.
 
-   **Shortcut:** Run `just install-local kamigawa` from the checkout, replacing `kamigawa` with your host name. The recipe evaluates the configuration, then Disko erases and mounts the target disk. The full system build runs during installation using the target disk’s Nix store. A build failure at that point leaves the previous installation erased. Enter the new disk passphrase if prompted, then continue to step 4 once the recipe succeeds.
+### Install with Just
 
-   **Manual install:** If you skipped step 2, set `host=kamigawa` first, replacing `kamigawa` with your host name. Run each command in the checkout and continue only after it succeeds. First check that the selected host configuration evaluates.
+Run the recipe with your host name. For an encrypted ThinkPad install, run:
 
-   ```sh
-   nix --extra-experimental-features 'nix-command flakes' eval --raw \
-     ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath" > /dev/null
-   ```
+```sh
+just install-local <host>
 
-   **The next command erases the disk selected by the host configuration.** It runs the repo’s pinned Disko to partition, format, and mount the filesystems under `/mnt`. For LUKS, enter the new disk passphrase when prompted.
+# Ex.
+# just install-local tpx1
+```
 
-   ```sh
-   sudo nix --extra-experimental-features 'nix-command flakes' run --inputs-from . disko -- \
-     --mode destroy,format,mount --flake ".#$host"
-   ```
+Confirm the disk erase, enter the new disk passphrase when prompted, and enter Piotr’s login password after installation. The recipe reboots automatically once the password change succeeds. Remove the USB or eject the ISO as the machine restarts, then continue at [First boot](#first-boot-from-the-installed-disk).
 
-   Install the selected NixOS system onto those mounted filesystems.
+### Install manually
 
-   ```sh
-   sudo nixos-install \
-     --option extra-substituters https://cache.numtide.com \
-     --option extra-trusted-public-keys niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= \
-     --flake ".#$host" --no-root-passwd
-   ```
+Set `host` to the host name you verified above (for example, `host=tpx1`). Run each command only after the previous one succeeds. First check that the configuration evaluates.
 
-   If `nixos-install` fails after Disko succeeds, keep the filesystems mounted. Once you resolve the error, retry only the `nixos-install` command above. Running the shortcut again erases the disk again.
+```sh
+nix --extra-experimental-features 'nix-command flakes' eval --raw \
+  ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath" > /dev/null
+```
 
-4. **Set the login password and boot.** After the install succeeds, set Piotr's account password. Reboot after `passwd` succeeds and remove the USB or eject the VM's ISO as it restarts.
+**The next command erases the disk selected by the host configuration.** It runs the repo’s pinned Disko to partition, format, and mount the filesystems under `/mnt`. For LUKS, enter the new disk passphrase when prompted.
 
-   ```sh
-   sudo nixos-enter --root /mnt --command 'passwd piotr'
-   sudo reboot
-   ```
+```sh
+sudo nix --extra-experimental-features 'nix-command flakes' run --inputs-from . disko -- \
+  --mode destroy,format,mount --flake ".#$host"
+```
 
-   For LUKS, enter the disk passphrase at boot. Then log in as `piotr` with the account password. Reconnect Wi-Fi if needed. See the [first-boot checks and checkout location](#4-set-the-login-password-and-boot).
+Install the selected NixOS system onto those mounted filesystems.
+
+```sh
+sudo nixos-install \
+  --option extra-substituters https://cache.numtide.com \
+  --option extra-trusted-public-keys niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= \
+  --flake ".#$host" --no-root-passwd
+```
+
+If `nixos-install` fails after Disko succeeds, keep the filesystems mounted. Once you resolve the error, retry only the `nixos-install` command above. Running the shortcut again erases the disk again.
+
+After installation, set Piotr's account password. Reboot after `passwd` succeeds and remove the USB or eject the VM's ISO as it restarts.
+
+```sh
+sudo nixos-enter --root /mnt --command 'passwd piotr'
+sudo reboot
+```
+
+### First boot from the installed disk
+
+For LUKS, enter the disk passphrase at boot. Then log in as `piotr` with the account password. Reconnect Wi-Fi if needed. See the [first-boot checks and checkout location](#4-set-the-login-password-and-boot).
 
 ## 1. Connect to the target
 

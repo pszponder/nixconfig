@@ -4,8 +4,8 @@
 
 1. Create an x86_64 guest, enable UEFI, attach a blank virtual disk, and connect a network adapter with internet access. For the workstation template, a 64 GiB disk leaves room for its 9 GiB swap file, packages, and future generations. Attach the NixOS installer ISO and boot the guest.
 2. Create a host such as `lab-vm` using the [desktop walkthrough](#desktop-walkthrough). Scan **inside the guest** and select its virtual disk. If the hypervisor exposes no unique disk ID, give the virtual drive a serial or use its verified guest device path and keep the controller order fixed. For a local scan in a writable checkout, copy the template files and run `just bootstrap-hardware lab-vm` inside the guest.
-3. Stage the host files. From that checkout in the guest run `just install-local lab-vm`. Alternatively, authorize your controller's public key on the live ISO and run `just install lab-vm nixos@GUEST_IP` from the controller checkout containing the host files. With NAT, configure SSH forwarding or use a reachable bridged interface.
-4. Save the host files outside the live session. At the guest console run `sudo nixos-enter --root /mnt --command "passwd piotr"`, detach the ISO, and reboot from the virtual disk. Unlock LUKS at the VM console if enabled. Verify `hostname`, `findmnt /`, and `swapon --show`.
+3. Stage the host files and save a copy outside the live session before installing. From that checkout in the guest run `just install-local lab-vm`. Alternatively, authorize your controller's public key on the live ISO and run `just install lab-vm nixos@GUEST_IP` from the controller checkout containing the host files. With NAT, configure SSH forwarding or use a reachable bridged interface.
+4. The local recipe prompts for Piotr’s password and reboots automatically. For the SSH install, at the guest console run `sudo nixos-enter --root /mnt --command "passwd piotr"`, then reboot. For either workflow, detach the ISO as the guest restarts so it boots from the virtual disk. Unlock LUKS at the VM console if enabled. Verify `hostname`, `findmnt /`, and `swapon --show`.
 
 ## Add a remote development host
 
