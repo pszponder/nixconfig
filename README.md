@@ -14,6 +14,14 @@ A multi-host dendritic NixOS configuration, inspired by [Renato Garcia's simple 
 
 Nix installs applications and manages system configuration. Application dotfiles belong in [pszponder/dotfiles](https://github.com/pszponder/dotfiles). macOS and Ubuntu configuration are deferred.
 
+## Clone the repository
+
+```sh
+mkdir -p ~/repos/github/pszponder
+git clone https://github.com/pszponder/nixconfig.git ~/repos/github/pszponder/nixconfig
+cd ~/repos/github/pszponder/nixconfig
+```
+
 ## Install a host
 
 Follow the [installation guide](docs/install.md) to install or reinstall a configured host from a NixOS USB or over SSH.
