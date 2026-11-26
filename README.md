@@ -24,9 +24,9 @@ Follow the [installation guide](docs/install.md) to install or reinstall a confi
 
 ## Applying the flake to an existing installation
 
-On the original laptop, the declared partition GUIDs match the existing filesystems. A normal `just switch tpx1` activates a generation without running the disk installer.
+On the original unencrypted ThinkPad, the declared partition GUIDs match the existing filesystems. Run `just switch tpx1-unencrypted` to activate the renamed configuration without running the disk installer. On a ThinkPad previously configured as `tpx1-encrypted`, run `just switch tpx1` to activate its new hostname.
 
-For a different graphical or manual installation, first compare `lsblk -o NAME,PARTUUID,FSTYPE,MOUNTPOINTS` and the installed boot configuration with the host's disk module. Adapt the host's disk, filesystem and boot declarations to the installed layout before switching. Preserve its `system.stateVersion`. Run `just bootstrap-hardware tpx1` from the installed system to refresh driver detection. It uses `--no-filesystems` because disko supplies mounts and swap. Review the diff before activating. The existing user's password is retained.
+For a different graphical or manual installation, first compare `lsblk -o NAME,PARTUUID,FSTYPE,MOUNTPOINTS` and the installed boot configuration with the host's disk module. Adapt the host's disk, filesystem and boot declarations to the installed layout before switching. Preserve its `system.stateVersion`. Run `just bootstrap-hardware HOST` with the matching host name from the installed system to refresh driver detection. It uses `--no-filesystems` because disko supplies mounts and swap. Review the diff before activating. The existing user's password is retained.
 
 ## Package channels
 

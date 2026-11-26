@@ -70,8 +70,8 @@ in
         };
       testLayouts = {
         kamigawa = encrypted;
-        tpx1 = plain;
-        tpx1-encrypted = encrypted;
+        tpx1-unencrypted = plain;
+        tpx1 = encrypted;
       };
       hosts = lib.filterAttrs (
         _: host: host.pkgs.stdenv.hostPlatform.system == system

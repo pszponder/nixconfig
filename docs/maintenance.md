@@ -4,7 +4,7 @@
 
 ## Building and switching
 
-Run these standard Nix commands from this checkout, selecting a host explicitly:
+Run these standard Nix commands from this checkout, selecting a host explicitly. The examples use the encrypted ThinkPad, `tpx1`. For the unencrypted ThinkPad, use `tpx1-unencrypted` in each command.
 
 ```sh
 nix build .#nixosConfigurations.tpx1.config.system.build.toplevel

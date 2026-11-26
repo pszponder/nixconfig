@@ -53,9 +53,13 @@ Look for a connected Ethernet or Wi-Fi device and a response containing `StoreDi
    lsblk -d -o PATH,SIZE,MODEL,SERIAL,WWN
    ```
 
-   Match the resolved path, model, and serial or WWN to the whole drive you backed up. If the path is missing or identifies another drive, stop here. Both ThinkPad variants select the same SSD. Use `tpx1-encrypted` for a fresh ThinkPad install. The legacy `tpx1` output describes the existing plain ext4 layout.
+   Match the resolved path, model, and serial or WWN to the whole drive you backed up. If the path is missing or identifies another drive, stop here. Both ThinkPad variants select the same SSD. Use `tpx1` for a fresh encrypted ThinkPad install. The `tpx1-unencrypted` output describes the existing plain ext4 layout.
 
-3. **Build and install.** Run each command in the checkout and continue only after it succeeds. First build the selected host while the target disk is still untouched.
+3. **Build and install.** Choose the shortcut or the manual commands below. Both erase the disk verified in step 2.
+
+   **Shortcut:** Run `just install-local "$host"` from the checkout to build the system, prepare the disk with Disko, and install NixOS. Enter the new disk passphrase if prompted, then continue to step 4 once the recipe succeeds.
+
+   **Manual install:** Run each command in the checkout and continue only after it succeeds. First build the selected host while the target disk is still untouched.
 
    ```sh
    nix --extra-experimental-features 'nix-command flakes' build --no-link \
@@ -74,8 +78,6 @@ Look for a connected Ethernet or Wi-Fi device and a response containing `StoreDi
    ```sh
    sudo nixos-install --flake ".#$host" --no-root-passwd
    ```
-
-   The optional shortcut `just install-local "$host"` runs all three commands after confirmation. Use either the shortcut or the manual sequence once.
 
 4. **Set the login password and boot.** After the install succeeds, set Piotr's account password. Reboot after `passwd` succeeds and remove the USB or eject the VM's ISO as it restarts.
 
@@ -115,8 +117,8 @@ Each target has its own flake output. Keep the host configurations together in t
 
 | Target                         | Set the host variable on the controller       | Disk and hardware                                                                                                      |
 | ------------------------------ | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| ThinkPad with unencrypted root | `host=tpx1`                                   | Same physical SSD as the encrypted variant.                                                                            |
-| Encrypted ThinkPad             | `host=tpx1-encrypted`                         | `wwn-0x5002538d41d1f7ec` in the [hardware module](../modules/hosts/tpx1/hardware.nix).                                 |
+| ThinkPad with unencrypted root | `host=tpx1-unencrypted`                       | Same physical SSD as the encrypted variant.                                                                            |
+| Encrypted ThinkPad             | `host=tpx1`                                   | `wwn-0x5002538d41d1f7ec` in the [hardware module](../modules/hosts/tpx1/hardware.nix).                                 |
 | Kamigawa desktop               | `host=kamigawa`                               | Samsung SSD 870 EVO 4 TB, `wwn-0x5002538f31b2732f` in the [host configuration](../modules/hosts/kamigawa/default.nix). |
 | New machine                    | `host=office-pc` (choose its actual hostname) | Add a host once using the steps below.                                                                                 |
 
@@ -210,4 +212,4 @@ swapon --show
 hostname
 ```
 
-For plain tpx1, expect ext4 root and a swap partition. For the encrypted workstations, expect ext4 on the host's encrypted root mapping (`/dev/mapper/kamigawa-crypt` on Kamigawa and `/dev/mapper/tpx1-crypt` on the encrypted ThinkPad), active `/swapfile`, and the selected hostname. Restore the installed repository revision at `~/repos/github/pszponder/nixconfig` for manual updates. Run `just bootstrap` for dotfiles and `just switch` for normal updates.
+For `tpx1-unencrypted`, expect ext4 root and a swap partition. For the encrypted workstations, expect ext4 on the host's encrypted root mapping (`/dev/mapper/kamigawa-crypt` on Kamigawa and `/dev/mapper/tpx1-crypt` on the encrypted ThinkPad), active `/swapfile`, and the selected hostname. Restore the installed repository revision at `~/repos/github/pszponder/nixconfig` for manual updates. Run `just bootstrap` for dotfiles and `just switch` for normal updates.
