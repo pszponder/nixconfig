@@ -3,6 +3,11 @@
     users.users.piotr = {
       isNormalUser = true;
       description = "Piotr";
+      extraGroups = [
+        "wheel"
+        "docker"
+        "networkmanager"
+      ];
     };
   };
 }

@@ -21,10 +21,12 @@ For an x86_64 UEFI mini PC on your LAN, use a dedicated host directory, wired Et
      ls -l /dev/disk/by-id/'
    ```
 
-2. **Create the host files.** Copy `default.nix` and `_disk.nix` from `kamigawa` into `modules/hosts/devbox/` and generate the new `_hardware-configuration.nix` using the [hardware scan commands](#desktop-walkthrough). Use the verified whole-drive ID in `default.nix`. Keep Disko, the hardware import, and systemd-boot. Replace `workstation` with `common`, keep `piotr`, and remove `desktopPackages`, `webapps`, `gnome`, and `printing`. Keep Docker only if your projects require it. Omit `nixMaintenance` and its settings if you plan to deploy updates from your laptop. Set `system.stateVersion` at first install and retain it on upgrades. For a basic SSH setup with only the `wheel` group, replace the template’s account groups and add:
+2. **Create the host files.** Copy `default.nix` and `_disk.nix` from `kamigawa` into `modules/hosts/devbox/` and generate the new `_hardware-configuration.nix` using the [hardware scan commands](#desktop-walkthrough). Use the verified whole-drive ID in `default.nix`. Keep Disko, the disk layout, and the hardware import. Replace `workstationCommon` and `gnome` with `common` and `piotr` for a headless server. Set `system.stateVersion` at first install and retain it on upgrades. For a UEFI server with DHCP, add these settings beside `networking.hostName`:
 
    ```nix
-   users.users.piotr.extraGroups = [ "wheel" ];
+   boot.loader.systemd-boot.enable = true;
+   boot.loader.efi.canTouchEfiVariables = true;
+   networking.useDHCP = true;
    users.users.piotr.openssh.authorizedKeys.keys = [
      "ssh-ed25519 REPLACE_WITH_YOUR_PUBLIC_KEY"
    ];
@@ -36,7 +38,6 @@ For an x86_64 UEFI mini PC on your LAN, use a dedicated host directory, wired Et
        PermitRootLogin = "no";
      };
    };
-   environment.systemPackages = [ pkgs.tmux ];
    ```
 
 3. **Choose how the server boots.** The template’s LUKS layout needs a passphrase at the console before SSH starts. Keep the encrypted root layout and give the mapper a host-specific name such as `devbox-crypt`. For unattended reboot, configure and test an unlock method appropriate to the host. Review the swap size for the available disk space.
@@ -55,7 +56,7 @@ For an x86_64 UEFI mini PC on your LAN, use a dedicated host directory, wired Et
 
 ## Add a desktop
 
-For a second desktop that should feel like the ThinkPad, start with `kamigawa` as a **directory template**. Both hosts import the same [workstation profile](../modules/features/workstation.nix) for the common baseline, development tools, and audio. Set boot, networking, account groups, maintenance, and `system.stateVersion` in the host definition. Each host explicitly selects its desktop session, graphical applications, Docker, and printing. The ThinkPad adds its own disk, drivers, fingerprint reader, and Kanata configuration. Give the desktop its own host directory so future shared changes reach both machines and hardware changes stay local.
+For a second desktop that should feel like the ThinkPad, start with `kamigawa` as a **directory template**. The [shared workstation profile](../modules/features/common-workstation.nix) supplies packages, bootloader, kernel, networking, and maintenance. [Piotr’s account module](../modules/users/piotr/default.nix) grants the `wheel`, `docker`, and `networkmanager` groups wherever it is imported. Keep the hostname, disk identity, hardware, and `system.stateVersion` in the host directory. The ThinkPad adds its own disk, drivers, fingerprint reader, and Kanata configuration. Give the desktop its own host directory so future shared changes reach both machines and hardware changes stay local.
 
 ## Desktop walkthrough
 
@@ -80,7 +81,7 @@ For a second desktop that should feel like the ThinkPad, start with `kamigawa` a
 
    The scan supplies the new host’s hardware configuration. Disko declares the filesystems. If the machine is running Ubuntu and you prefer to install directly over SSH, the [installer walkthrough](install.md#first-installation-on-a-new-host) includes hardware generation during the transition to the temporary installer.
 
-3. **Edit the new host's `default.nix`.** Replace Kamigawa’s disk identifier with the verified whole-drive path, such as `/dev/disk/by-id/…`. Review the new host’s `_disk.nix` for its partition sizes, encryption, filesystems, and mount points. Add desktop-only settings in the existing module block beside `networking.hostName`. For example, enable SSH there if you want to update the machine remotely. Replace the example text with the complete contents of your controller's public key file:
+3. **Edit the new host's `default.nix`.** Replace Kamigawa’s disk identifier with the verified whole-drive path, such as `/dev/disk/by-id/…`. Give the mapper in `_disk.nix` a host-specific name. The [shared encrypted layout](../modules/hosts/_encrypted-disk.nix) defines the partitions, filesystems, and swap. Add desktop-only settings in the existing module block beside `networking.hostName`. For example, enable SSH there if you want to update the machine remotely. Replace the example text with the complete contents of your controller's public key file:
 
    ```nix
    services.openssh.enable = true;
@@ -89,7 +90,7 @@ For a second desktop that should feel like the ThinkPad, start with `kamigawa` a
    ];
    ```
 
-   Choose the desktop session in this host’s module list. Keep `self.modules.nixos.gnome` for the ThinkPad’s GNOME session and GDM login. For Niri or Hyprland, remove that import and set `programs.niri.enable = true;` or `programs.hyprland.enable = true;` in the host’s configuration block. Select a display manager separately if you want graphical login. The disk layout, install command and future rebuilds use the same host name regardless of desktop choice.
+   The host imports `gnome` alongside `workstationCommon` to select GNOME and GDM. To use another desktop, replace the host’s `gnome` import with the configuration for your chosen session and display manager.
 
    Review the generated drivers and add settings for peripherals that actually exist, such as a discrete GPU requiring a particular driver. To change a feature for both desktops, edit the module they both import. To change only this desktop, edit its host directory.
 
@@ -110,7 +111,7 @@ For a second desktop that should feel like the ThinkPad, start with `kamigawa` a
 
 Provision a disposable instance first. Choose a unique host directory such as `hetzner-web`, `do-dev`, or `ec2-build`. Record the guest architecture, boot mode, root volume identifier, network setup, SSH user, and recovery-console access. A hardware scan describes devices; it doesn't capture the cloud account's network, firewall, or volume settings.
 
-For a **graphical UEFI VM**, follow the desktop steps. Generate the hardware configuration inside the guest. For a **headless server**, keep the host-directory pattern and select the services it needs. For example, on a compatible x86_64 UEFI guest where you want interactive LUKS, remove the GNOME, desktop package, web app, Docker and printing imports unless needed. Replace the `workstation` import with `self.modules.nixos.common` and keep `self.modules.nixos.piotr` if you want that account. Review the copied NetworkManager, kernel, account groups, and maintenance settings for the server. Retain the disko module, the host’s `_disk.nix`, and the guest hardware module, and put the following settings beside the host's disk selection:
+For a **graphical UEFI VM**, follow the desktop steps. Generate the hardware configuration inside the guest. For a **headless server**, keep the host-directory pattern and select the services it needs. For a compatible x86_64 UEFI guest, replace `workstationCommon` and `gnome` with `common` and `piotr` as in the [remote development host](#add-a-remote-development-host). Configure the guest’s bootloader and networking for the provider. Retain the disko module, the host’s `_disk.nix`, and the guest hardware module, and put the following settings beside the host's disk selection:
 
 ```nix
 boot.loader.systemd-boot.enable = true;
