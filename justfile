@@ -130,6 +130,9 @@ install host target:
 # Clean install from a NixOS live USB or ISO onto this machine
 [confirm("Erase the configured disk on THIS machine and install NixOS? [y/N]")]
 install-local host:
-    nix --extra-experimental-features 'nix-command flakes' build --no-link ".#nixosConfigurations.$1.config.system.build.toplevel"
+    nix --extra-experimental-features 'nix-command flakes' eval --raw ".#nixosConfigurations.$1.config.system.build.toplevel.drvPath" > /dev/null
     sudo nix --extra-experimental-features 'nix-command flakes' run --inputs-from . disko -- --mode destroy,format,mount --flake ".#$1"
-    sudo nixos-install --flake ".#$1" --no-root-passwd
+    sudo nixos-install \
+        --option extra-substituters https://cache.numtide.com \
+        --option extra-trusted-public-keys niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= \
+        --flake ".#$1" --no-root-passwd

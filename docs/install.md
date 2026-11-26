@@ -42,31 +42,43 @@ Look for a connected Ethernet or Wi-Fi device and a response containing `StoreDi
 
    Make sure you are on the desired branch.
 
-2. **Choose the host and check the disk.** List the host directories and set `host` to the one you intend to install. This example selects Kamigawa.
+2. **Optional: look up the host and verify its configured disk.** If you already know the host name and have confirmed which physical drive its configuration selects, skip this step and pass the host name directly to the shortcut in step 3. Use the commands below if you need to look up the host or verify the disk, especially after changing the disk configuration. This example selects Kamigawa.
 
    ```sh
+   # List the host configurations in this checkout.
    ls modules/hosts
+
+   # Select the host you intend to install.
    host=kamigawa
+
+   # Read the whole-disk path Disko will use for this host.
    disk=$(nix --extra-experimental-features 'nix-command flakes' eval --raw ".#nixosConfigurations.$host.config.disko.devices.disk.main.device")
+
+   # Show the configured path. For a WWN-based path, the drive's WWN is in the name.
    echo "$disk"
+
+   # Resolve that path to a device such as /dev/sda. If it prints nothing, stop.
    readlink -e "$disk"
+
+   # Find that device in the PATH column and check its serial or WWN against
+   # the drive you backed up. Use the size and model as additional checks.
    lsblk -d -o PATH,SIZE,MODEL,SERIAL,WWN
    ```
 
    Match the resolved path, model, and serial or WWN to the whole drive you backed up. If the path is missing or identifies another drive, stop here. Both ThinkPad variants select the same SSD. Use `tpx1` for a fresh encrypted ThinkPad install. The `tpx1-unencrypted` output describes the existing plain ext4 layout.
 
-3. **Build and install.** Choose the shortcut or the manual commands below. Both erase the disk verified in step 2.
+3. **Build and install.** Choose the shortcut or the manual commands below. Both erase the disk selected by the host configuration.
 
-   **Shortcut:** Run `just install-local "$host"` from the checkout to build the system, prepare the disk with Disko, and install NixOS. Enter the new disk passphrase if prompted, then continue to step 4 once the recipe succeeds.
+   **Shortcut:** Run `just install-local kamigawa` from the checkout, replacing `kamigawa` with your host name. The recipe evaluates the configuration, then Disko erases and mounts the target disk. The full system build runs during installation using the target disk’s Nix store. A build failure at that point leaves the previous installation erased. Enter the new disk passphrase if prompted, then continue to step 4 once the recipe succeeds.
 
-   **Manual install:** Run each command in the checkout and continue only after it succeeds. First build the selected host while the target disk is still untouched.
+   **Manual install:** If you skipped step 2, set `host=kamigawa` first, replacing `kamigawa` with your host name. Run each command in the checkout and continue only after it succeeds. First check that the selected host configuration evaluates.
 
    ```sh
-   nix --extra-experimental-features 'nix-command flakes' build --no-link \
-     ".#nixosConfigurations.$host.config.system.build.toplevel"
+   nix --extra-experimental-features 'nix-command flakes' eval --raw \
+     ".#nixosConfigurations.$host.config.system.build.toplevel.drvPath" > /dev/null
    ```
 
-   **The next command erases the disk verified in step 2.** It runs the repo’s pinned Disko to partition, format, and mount the filesystems under `/mnt`. For LUKS, enter the new disk passphrase when prompted.
+   **The next command erases the disk selected by the host configuration.** It runs the repo’s pinned Disko to partition, format, and mount the filesystems under `/mnt`. For LUKS, enter the new disk passphrase when prompted.
 
    ```sh
    sudo nix --extra-experimental-features 'nix-command flakes' run --inputs-from . disko -- \
@@ -76,8 +88,13 @@ Look for a connected Ethernet or Wi-Fi device and a response containing `StoreDi
    Install the selected NixOS system onto those mounted filesystems.
 
    ```sh
-   sudo nixos-install --flake ".#$host" --no-root-passwd
+   sudo nixos-install \
+     --option extra-substituters https://cache.numtide.com \
+     --option extra-trusted-public-keys niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= \
+     --flake ".#$host" --no-root-passwd
    ```
+
+   If `nixos-install` fails after Disko succeeds, keep the filesystems mounted. Once you resolve the error, retry only the `nixos-install` command above. Running the shortcut again erases the disk again.
 
 4. **Set the login password and boot.** After the install succeeds, set Piotr's account password. Reboot after `passwd` succeeds and remove the USB or eject the VM's ISO as it restarts.
 
