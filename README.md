@@ -16,33 +16,11 @@ Nix installs applications and manages system configuration. Application dotfiles
 
 ## Install a host
 
-`just` reads the recipes in this repository’s `justfile`. For a local install, boot the target from the NixOS USB or ISO, [connect it to the internet](docs/install.md#connect-the-live-installer-to-the-internet), and run the following at the live console. The first command makes Git and Just available in a temporary shell. Run the remaining commands inside that shell.
+Follow the [installation guide](docs/install.md) to install or reinstall a configured host from a NixOS USB or over SSH.
 
-```sh
-nix-shell -p git just
-git clone https://github.com/pszponder/nixconfig.git
-cd nixconfig
-just --list
-```
-
-For either SSH workflow, run the setup on your controller (an x86_64 Linux machine with Nix and flakes enabled). If you already have a checkout, `cd` into it and skip the clone. For `just deploy`, include `nixos-rebuild` in the controller shell with `nix-shell -p git just nixos-rebuild`. The SSH target does not need Just.
-
-From the checkout, choose one command below. Replace `HOST` with a configuration name such as `kamigawa` and `USER@TARGET` with the target’s SSH login and address. **Both install commands erase the disk selected by the host configuration.** Back it up and [match the configured disk to the physical drive](docs/install.md#install-directly-from-a-nixos-usb) on the target before confirming.
-
-| Where you run the command | Command |
-| --- | --- |
-| On the target, booted from a NixOS USB or ISO, in this checkout | `just install-local HOST` |
-| On your controller, with SSH access to the target | `just install HOST USER@TARGET` |
-| On your controller, with [SSH login and sudo access on the installed NixOS system](docs/maintenance.md#update-an-existing-nixos-host-over-ssh) | `just deploy HOST USER@TARGET` |
-
-New hosts use encrypted storage by default. The supplied hosts are `kamigawa`, `tpx1`, and `tpx1-encrypted`. The two ThinkPad configurations select the same physical SSD. Only `tpx1-encrypted` and `kamigawa` prompt for a disk passphrase. Both install commands leave the installer running so you can set Piotr’s password before rebooting.
-
-- [Manual local install from the minimal ISO](docs/install.md#connect-the-live-installer-to-the-internet) or [manual install over SSH](docs/install.md#1-connect-to-the-target)
 - [Install a persistent VM](docs/new-host.md#install-a-persistent-vm)
-- [Add a physical host](docs/new-host.md) or [configure a DigitalOcean, Hetzner, or AWS guest](docs/new-host.md#creating-a-cloud-host)
-- [Update over SSH](docs/maintenance.md#update-an-existing-nixos-host-over-ssh)
-
-To rehearse a supplied host’s installation on a disposable VM disk, run `just install-test HOST`.
+- [Add a physical host](docs/new-host.md) or [configure a cloud guest](docs/new-host.md#creating-a-cloud-host)
+- [Update an installed host over SSH](docs/maintenance.md#update-an-existing-nixos-host-over-ssh)
 
 ## Applying the flake to an existing installation
 

@@ -6,6 +6,8 @@ For routine configuration changes on an installed NixOS host, use `just deploy H
 
 You can [install directly from a NixOS USB](#install-directly-from-a-nixos-usb) with a copy of this repository. For the SSH workflow in steps 1–4, run the controller commands from a second x86_64 Linux machine with Nix flakes and the repository. The controller can be the computer hosting the VM.
 
+To rehearse a supplied host’s installation on a disposable VM disk, run `just install-test HOST` from the checkout.
+
 ## Connect the live installer to the internet
 
 Boot the **NixOS minimal USB or ISO** using its UEFI boot entry. The live console logs you in as `nixos`. Run these commands at that prompt. For the supplied hosts, the following should print `UEFI`. If it prints nothing, reboot and select the UEFI entry.
@@ -29,11 +31,11 @@ Look for a connected Ethernet or Wi-Fi device and a response containing `StoreDi
 
 ## Install directly from a NixOS USB
 
-1. **Get the tools and clone your repository.** From the live user's home directory, open a temporary shell with Git. If you prefer the Just shortcuts, use `nix-shell -p git just` instead. Run the remaining steps in that shell.
+1. **Get the tools and clone your repository.** From the live user's home directory, open a temporary shell with Git and Just. Run the remaining steps in that shell. The manual commands below do not require Just, but including it makes the documented shortcuts available.
 
    ```sh
    cd ~
-   nix-shell -p git
+   nix-shell -p git just
    git clone https://github.com/pszponder/nixconfig.git
    cd nixconfig
    ```

@@ -79,6 +79,7 @@ Use this recipe to rebuild an installed NixOS host using its existing filesystem
 
 Before the first deployment:
 
+- On the controller, open the repository checkout with Nix flakes enabled and Git, Just, and `nixos-rebuild` available. Use `nix-shell -p git just nixos-rebuild` if you need those tools.
 - Add a host composition with its own hardware configuration, platform, boot settings, and `system.stateVersion`. Select server features explicitly.
 - Enable `services.openssh`, declare the deployment user's `openssh.authorizedKeys.keys`, and provide sudo access. Verify the SSH host key and test login first.
 - Ensure the build machine can build the target platform. `--target-host` alone does not configure cross-compilation. A remote builder needs SSH access and working Nix builds; store transfers may also require configured signing trust or an appropriately trusted Nix user.
@@ -116,8 +117,6 @@ For other deployment modes, choose the command that fits your setup.
 The recipe runs as your regular local user so SSH can use your keys, agent, and aliases. It uses `--elevate sudo --ask-elevate-password` for remote activation, prompting locally for the target user's sudo password. These flags are supported by the installed `nixos-rebuild`; older versions may use `--sudo --ask-sudo-password`. The article's `--use-remote-sudo` flag is deprecated. For passwordless automation, use the underlying command with the elevation and authentication settings appropriate to the deployment account.
 
 Remote `test` preserves the old boot default but cannot restore SSH automatically. Consider [deploy-rs](https://github.com/serokell/deploy-rs) when deployments need connectivity confirmation and automatic rollback. Keep a console or other recovery path available for boot and network changes.
-
-For a fresh installation, follow the [tpx1 disko and nixos-anywhere procedure](../README.md#install-a-host). The install recipe erases the target disk. Use the deployment recipe above for routine updates.
 
 See the upstream [nixos-rebuild command reference](https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/ni/nixos-rebuild-ng/nixos-rebuild.8.scd) for build-host, target-host, and elevation options.
 
