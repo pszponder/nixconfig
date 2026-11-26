@@ -53,6 +53,15 @@
 
 - [nix-wrapper-modules](https://github.com/nix-community/nix-wrapper-modules)
 
+## Disk Configuration
+- [disko](https://github.com/nix-community/disko)
+- [Remote eployment of NixOS Using nixos-anywhere and Disko](https://mich-murphy.com/nixos-anywhere-and-disko/)
+-
+
+## Install through SSH
+- [nixos-anywhere](https://github.com/nix-community/nixos-anywhere)
+- [nixos-anywhere-examples](https://github.com/nix-community/nixos-anywhere-examples)
+
 ## Quickshell
 
 - [Quickshell](https://quickshell.org/)

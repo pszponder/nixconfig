@@ -14,59 +14,24 @@ A multi-host dendritic NixOS configuration, inspired by [Renato Garcia's simple 
 
 Nix installs applications and manages system configuration. Application dotfiles belong in [pszponder/dotfiles](https://github.com/pszponder/dotfiles). macOS and Ubuntu configuration are deferred.
 
-## Choose a command
+## Install a host
 
-| What you want to do                                                  | Command                         | What happens to the disk                                                           |
-| -------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
-| Update a running NixOS host over SSH                                 | `just deploy HOST USER@TARGET`  | Activates a new system generation using the existing filesystems.                  |
-| Install on a blank disk, replace Ubuntu, or wipe and reinstall NixOS | `just install HOST USER@TARGET` | **Erases the configured target disk** and creates the host’s declared disk layout. |
-| Rehearse a clean install before touching the target                  | `just install-test HOST`        | Uses a disposable VM disk.                                                         |
+Choose a configured host with `ls modules/hosts`. Its configuration selects the disk. **Both install commands erase that disk.** Back it up and compare its configured path with `lsblk` on the target before confirming.
 
-`HOST` selects the flake configuration. `USER@TARGET` selects the SSH destination. For example, after installing `kamigawa` and configuring SSH on it, use `just deploy kamigawa piotr@DESKTOP_IP` for subsequent changes. When logged into the installed host, use `just switch`. See the [remote deployment guide](docs/maintenance.md#update-an-existing-nixos-host-over-ssh) for preview and activation options.
+| Where you run the command | Command |
+| --- | --- |
+| On the target, booted from a NixOS USB or ISO, in this checkout | `just install-local HOST` |
+| On your controller, with SSH access to the target | `just install HOST USER@TARGET` |
+| On your controller, to update an already installed NixOS system | `just deploy HOST USER@TARGET` |
 
-## Install or reinstall a host
+New hosts use encrypted storage by default. The supplied hosts are `kamigawa`, `tpx1`, and `tpx1-encrypted`. The two ThinkPad configurations select the same physical SSD. Only `tpx1-encrypted` and `kamigawa` prompt for a disk passphrase. Both install commands leave the installer running so you can set Piotr’s password before rebooting.
 
-For a clean install or reinstall of **Kamigawa** or **the encrypted ThinkPad**, start with the [encrypted workstation installation guide](docs/encrypted-install.md). It covers booting the installer, verifying the target drive, running the disposable VM test, installing, and setting the login password before reboot. Use `kamigawa` for the desktop or `tpx1-encrypted` for the ThinkPad.
+- [Manual local install from the minimal ISO](docs/install.md#connect-the-live-installer-to-the-internet) or [manual install over SSH](docs/install.md#1-connect-to-the-target)
+- [Install a persistent VM](docs/new-host.md#install-a-persistent-vm)
+- [Add a physical host](docs/new-host.md) or [configure a DigitalOcean, Hetzner, or AWS guest](docs/new-host.md#creating-a-cloud-host)
+- [Update over SSH](docs/maintenance.md#update-an-existing-nixos-host-over-ssh)
 
-You can also [install directly from a NixOS USB](docs/encrypted-install.md#install-directly-from-a-nixos-usb) with internet access and a copy of this repository.
-
-For a new machine, start with [Add a desktop or cloud VM](docs/new-host.md) to give it its own host configuration, disk identifier, and hardware scan. For a headless mini PC or SSH development machine, see [Add a remote development host](docs/new-host.md#add-a-remote-development-host).
-
-## Clean install on `tpx1`
-
-Run these commands from a second x86_64-linux machine with Nix flakes and just. Use the same checkout for installation and later updates. Stage any new Nix files so the flake can see them. If the controller does not already use the Numtide cache, enable it for this shell before building the desktop configuration:
-
-```sh
-export NIX_CONFIG="extra-substituters = https://cache.numtide.com
-extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-```
-
-1. Back up the laptop. The install recipe **erases the drive** selected in `modules/hosts/tpx1/hardware.nix`. It creates a 1 GiB EFI partition, ext4 root and about 9 GiB swap. The disk WWN and partition GUIDs match the current laptop. For a replacement disk, verify its whole-disk ID and change the WWN. For another machine, create its own host configuration, disk identifiers and hardware scan.
-2. Run `just install-test tpx1` to exercise the layout, UEFI boot and activation of a second system generation on a disposable VM disk. The test uses a smaller swap reservation to fit its 4 GiB virtual disk.
-3. Boot a NixOS installer USB on the laptop in UEFI mode and connect it to the network. From its console, run `sudo systemctl start sshd` and authorize your controller's SSH key for the live installer user. From the controller, check SSH, passwordless sudo, and the target drive. Replace `INSTALLER_IP` with the live address.
-
-   ```sh
-   ssh nixos@INSTALLER_IP 'sudo -n true && lsblk -o NAME,SIZE,MODEL,MOUNTPOINTS && ls -l /dev/disk/by-id/wwn-0x5002538d41d1f7ec'
-   ```
-
-4. Match the whole-disk ID above to the model and size of the drive you backed up. Once you confirm the match, start the install. **This erases that drive.**
-
-   ```sh
-   just install tpx1 nixos@INSTALLER_IP
-   ```
-
-5. The recipe detects the live installer, runs the disk and installation phases, and leaves the USB environment running. Set the local login password before rebooting, then remove the USB at reboot.
-
-   ```sh
-   ssh -t nixos@INSTALLER_IP 'sudo nixos-enter --root /mnt --command "passwd piotr"'
-   ssh nixos@INSTALLER_IP 'sudo reboot'
-   ```
-
-6. Log in locally as `piotr`. Clone the installed revision into `~/repos/github/pszponder/nixconfig`, the location used by scheduled maintenance. Run `just bootstrap` there for dotfiles and restore private keys separately. Use `just switch tpx1` for subsequent changes. Remote updates require configuring SSH access on the installed system as described in [maintenance](docs/maintenance.md).
-
-### Encrypted installation
-
-Follow the [encrypted reinstall guide](docs/encrypted-install.md) for an existing workstation or a new named host, starting from Ubuntu, installed NixOS, or a live NixOS USB or ISO.
+To rehearse a supplied host’s installation on a disposable VM disk, run `just install-test HOST`.
 
 ## Applying the flake to an existing installation
 

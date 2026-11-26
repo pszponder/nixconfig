@@ -126,3 +126,10 @@ install-test host=`hostname`:
 [confirm("Erase the configured disk on the SSH target and install NixOS? [y/N]")]
 install host target:
     nix run .#nixos-anywhere -- --flake ".#$1" --phases kexec,disko,install --target-host "$2"
+
+# Clean install from a NixOS live USB or ISO onto this machine
+[confirm("Erase the configured disk on THIS machine and install NixOS? [y/N]")]
+install-local host:
+    nix --extra-experimental-features 'nix-command flakes' build --no-link ".#nixosConfigurations.$1.config.system.build.toplevel"
+    sudo nix --extra-experimental-features 'nix-command flakes' run --inputs-from . disko -- --mode destroy,format,mount --flake ".#$1"
+    sudo nixos-install --flake ".#$1" --no-root-passwd

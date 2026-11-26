@@ -1,5 +1,12 @@
 # Add a NixOS host
 
+## Install a persistent VM
+
+1. Create an x86_64 guest, enable UEFI, attach a blank virtual disk, and connect a network adapter with internet access. For the workstation template, a 64 GiB disk leaves room for its 9 GiB swap file, packages, and future generations. Attach the NixOS installer ISO and boot the guest.
+2. Create a host such as `lab-vm` using the [desktop walkthrough](#desktop-walkthrough). Scan **inside the guest** and select its virtual disk. If the hypervisor exposes no unique disk ID, give the virtual drive a serial or use its verified guest device path and keep the controller order fixed. For a local scan in a writable checkout, copy the template files and run `just bootstrap-hardware lab-vm` inside the guest.
+3. Stage the host files. From that checkout in the guest run `just install-local lab-vm`. Alternatively, authorize your controller's public key on the live ISO and run `just install lab-vm nixos@GUEST_IP` from the controller checkout containing the host files. With NAT, configure SSH forwarding or use a reachable bridged interface.
+4. Save the host files outside the live session. At the guest console run `sudo nixos-enter --root /mnt --command "passwd piotr"`, detach the ISO, and reboot from the virtual disk. Unlock LUKS at the VM console if enabled. Verify `hostname`, `findmnt /`, and `swapon --show`.
+
 ## Add a remote development host
 
 For an x86_64 UEFI mini PC on your LAN, use a dedicated host directory, wired Ethernet with a DHCP reservation, and SSH key access. Keep project toolchains in each repository’s development shell. For a hosted VM, use the provider-specific boot and storage guidance [below](#creating-a-cloud-host) and reuse the SSH and development setup here.
@@ -32,7 +39,7 @@ For an x86_64 UEFI mini PC on your LAN, use a dedicated host directory, wired Et
    environment.systemPackages = [ pkgs.tmux ];
    ```
 
-3. **Choose how the server boots.** The template’s LUKS layout needs a passphrase at the console before SSH starts. If unattended reboot is required and an unencrypted disk is acceptable, keep the EFI partition, replace the `system` partition’s LUKS content with its inner ext4 filesystem definition, and change its GPT type from `8309` to `8300`. Review the swap size for the available disk space. If you keep LUKS, give the mapper its own name, such as `devbox-crypt`.
+3. **Choose how the server boots.** The template’s LUKS layout needs a passphrase at the console before SSH starts. Keep the encrypted root layout and give the mapper a host-specific name such as `devbox-crypt`. For unattended reboot, configure and test an unlock method appropriate to the host. Review the swap size for the available disk space.
 
 4. **Build and verify before installing.** From your laptop, stage the host files and check that the evaluated disk path matches the whole drive you identified:
 
@@ -42,7 +49,7 @@ For an x86_64 UEFI mini PC on your LAN, use a dedicated host directory, wired Et
    just build "$host"
    ```
 
-   If you retained the template’s LUKS layout, run `just install-test "$host"` to rehearse on a disposable VM disk. The repo currently registers a check for that layout and has no generic check for a new unencrypted host. **`just install "$host" "$target"` erases the selected drive.** Run it once the disk and build are verified, then [set Piotr’s login password and boot from the SSD](encrypted-install.md#4-set-the-login-password-and-boot).
+   For the template’s LUKS layout, run `just install-test "$host"` to rehearse on a disposable VM disk. **`just install "$host" "$target"` erases the selected drive.** Run it after the build and the [remote disk and headless access checks](install.md#verify-the-selected-disk) succeed, then [set Piotr’s login password and boot from the SSD](install.md#4-set-the-login-password-and-boot).
 
 5. **Verify access and start developing.** Use the router’s DHCP reservation for a stable LAN address. Connect as `piotr`, run `sudo -v` to verify elevation, and reboot once more to check that the machine is reachable with the chosen unlock procedure. Use [`just deploy devbox piotr@DEVBOX_IP`](maintenance.md#update-an-existing-nixos-host-over-ssh) for later system updates. On the server, clone a project, run `tmux new -s dev`, and enter its shell with `nix develop` if it defines one. For a web app listening on the server’s loopback port 3000, run `ssh -L 3000:localhost:3000 piotr@DEVBOX_IP` from your laptop and open `http://localhost:3000`. For access away from home, use a private VPN and keep SSH off the router’s public port forwards.
 
@@ -71,7 +78,7 @@ For a second desktop that should feel like the ThinkPad, start with `kamigawa` a
      test -s "$scan" && cp "$scan" "$host_dir/_hardware-configuration.nix"
    ```
 
-   The scan supplies the new host’s hardware configuration. Disko declares the filesystems. If the machine is running Ubuntu and you prefer to install directly over SSH, the [installer walkthrough](encrypted-install.md#3-build-and-install) includes hardware generation during the transition to the temporary installer.
+   The scan supplies the new host’s hardware configuration. Disko declares the filesystems. If the machine is running Ubuntu and you prefer to install directly over SSH, the [installer walkthrough](install.md#first-installation-on-a-new-host) includes hardware generation during the transition to the temporary installer.
 
 3. **Edit the new host's `default.nix`.** Replace Kamigawa’s disk identifier with the verified whole-drive path, such as `/dev/disk/by-id/…`. Review the new host’s `_disk.nix` for its partition sizes, encryption, filesystems, and mount points. Add desktop-only settings in the existing module block beside `networking.hostName`. For example, enable SSH there if you want to update the machine remotely. Replace the example text with the complete contents of your controller's public key file:
 
@@ -95,7 +102,7 @@ For a second desktop that should feel like the ThinkPad, start with `kamigawa` a
    just install-test "$host"
    ```
 
-5. **Install, then set the login password.** From an interactive terminal run `just install "$host" "$target"`. **This erases the selected drive.** Enter the new LUKS passphrase when prompted. With the installer still running, set Piotr's login password, reboot from the drive, and unlock it at the desktop console. The [first-boot instructions](encrypted-install.md#4-set-the-login-password-and-boot) include the commands for USB and kexec installations.
+5. **Install, then set the login password.** Complete the [remote disk check](install.md#verify-the-selected-disk) and, for SSH-managed machines, the headless access check below it. From an interactive terminal run `just install "$host" "$target"`. **This erases the selected drive.** Enter the new LUKS passphrase when prompted. With the installer still running, set Piotr's login password, reboot from the drive, and unlock it at the desktop console. The [first-boot instructions](install.md#4-set-the-login-password-and-boot) include the commands for USB and kexec installations.
 
 6. Save the host configuration in Git and restore the checkout at `~/repos/github/pszponder/nixconfig` on the installed desktop for scheduled maintenance. Use `just switch` locally or `just deploy new-host piotr@DESKTOP_IP` remotely for later changes. Use `just install` again only for a deliberate clean reinstall.
 

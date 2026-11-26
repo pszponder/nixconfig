@@ -75,7 +75,7 @@ journalctl -u fprintd.service -b
 
 ## Update an existing NixOS host over SSH
 
-Use this recipe to rebuild an installed NixOS host using its existing filesystems. For a fresh disk layout, follow the [clean installation guide](encrypted-install.md). The deployment command is `just deploy HOST TARGET [ACTION] [BUILD_HOST]`. `HOST` selects `nixosConfigurations.HOST`; `TARGET` is a required SSH destination, such as `piotr@server1` or an SSH configuration alias. The default action is `switch` and the default build location is the local machine. All actions ask for confirmation.
+Use this recipe to rebuild an installed NixOS host using its existing filesystems. For a fresh disk layout, follow the [clean installation guide](install.md). The deployment command is `just deploy HOST TARGET [ACTION] [BUILD_HOST]`. `HOST` selects `nixosConfigurations.HOST`; `TARGET` is a required SSH destination, such as `piotr@server1` or an SSH configuration alias. The default action is `switch` and the default build location is the local machine. All actions ask for confirmation.
 
 Before the first deployment:
 
@@ -117,7 +117,7 @@ The recipe runs as your regular local user so SSH can use your keys, agent, and 
 
 Remote `test` preserves the old boot default but cannot restore SSH automatically. Consider [deploy-rs](https://github.com/serokell/deploy-rs) when deployments need connectivity confirmation and automatic rollback. Keep a console or other recovery path available for boot and network changes.
 
-For a fresh installation, follow the [tpx1 disko and nixos-anywhere procedure](../README.md#clean-install-on-tpx1). The install recipe erases the target disk. Use the deployment recipe above for routine updates.
+For a fresh installation, follow the [tpx1 disko and nixos-anywhere procedure](../README.md#install-a-host). The install recipe erases the target disk. Use the deployment recipe above for routine updates.
 
 See the upstream [nixos-rebuild command reference](https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/ni/nixos-rebuild-ng/nixos-rebuild.8.scd) for build-host, target-host, and elevation options.
 
