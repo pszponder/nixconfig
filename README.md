@@ -67,10 +67,23 @@ The Stow checkout defaults to `~/repos/github/pszponder/dotfiles`. After resolvi
 
 ```sh
 just bootstrap
-# Or select an existing checkout:
-just bootstrap-dotfiles /path/to/dotfiles
+# Or use an existing checkout at a different path:
+just bootstrap /path/to/dotfiles
 ```
 
 The script clones `pszponder/dotfiles` over HTTPS when needed, validates the origin and Stow layout, and runs `just stow` inside the checkout. It does not pull updates or invoke the repository's application installers. The Stow recipe backs up conflicting files under `~/.dotfiles-backup` before creating symlinks. Bootstrap is intentionally separate from system activation.
+
+### SSH keys
+
+After applying the dotfiles, `just bootstrap` runs `just bootstrap-ssh` in the [dotfiles checkout](https://github.com/pszponder/dotfiles). To run the SSH step on its own:
+
+```sh
+cd ~/repos/github/pszponder/dotfiles
+just bootstrap-ssh
+```
+
+If you used a different checkout path, change into that directory instead. The recipe prompts for a passphrase for each new Ed25519 key. It skips a key pair if either the private key or its `.pub` file already exists. It uses `~/.ssh/default` for the default key and `~/.ssh/github/pszponder/personal` for GitHub. To apply dotfiles alone, run `just bootstrap-dotfiles` from `nixconfig`, with the checkout path as an optional argument.
+
+Add `~/.ssh/github/pszponder/personal.pub` to your GitHub account’s SSH keys and keep the private key on your machine. From a checkout with an SSH remote, run `git ls-remote origin HEAD` to verify access.
 
 See the [host-name ideas](docs/hostnames.md) for future machines.

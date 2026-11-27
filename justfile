@@ -17,8 +17,9 @@ default:
 remote-ssh:
     git remote set-url origin git@github.com:pszponder/nixconfig.git
 
-# Set up dotfiles after activating the system configuration
-bootstrap: bootstrap-dotfiles
+# Set up dotfiles and SSH keys after activating the system configuration
+bootstrap *args:
+    bash scripts/bootstrap-dotfiles --with-ssh "$@"
 
 # Generate hardware configuration from the installed system before the first rebuild
 bootstrap-hardware host:
