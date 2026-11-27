@@ -35,10 +35,6 @@ in
       ...
     }:
     let
-      plain = _: {
-        # disko's test VM supplies a sparse 4 GiB disk.
-        disko.devices.disk.main.content.partitions.root.end = lib.mkForce "-512M";
-      };
       encrypted =
         host:
         let
@@ -70,7 +66,6 @@ in
         };
       testLayouts = {
         kamigawa = encrypted;
-        tpx1-unencrypted = plain;
         tpx1 = encrypted;
       };
       hosts = lib.filterAttrs (

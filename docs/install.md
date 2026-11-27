@@ -65,7 +65,7 @@ Look for a connected Ethernet or Wi-Fi device and a response containing `StoreDi
    lsblk -d -o PATH,SIZE,MODEL,SERIAL,WWN
    ```
 
-   Match the resolved path, model, and serial or WWN to the whole drive you backed up. If the path is missing or identifies another drive, stop here. Both ThinkPad variants select the same SSD. Use `tpx1` for a fresh encrypted ThinkPad install. The `tpx1-unencrypted` output describes the existing plain ext4 layout.
+   Match the resolved path, model, and serial or WWN to the whole drive you backed up. If the path is missing or identifies another drive, stop here.
 
 From the checkout, choose one installation method. Both erase the selected disk before building the full system in its Nix store.
 
@@ -122,11 +122,11 @@ For LUKS, enter the disk passphrase at boot. Then log in as `piotr` with the acc
 
 ## 1. Connect to the target
 
-| Target at startup                                    | How to connect                                                                                                                                                     |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Target at startup | How to connect |
+| --- | --- |
 | Ubuntu or installed NixOS with SSH and working kexec | Use the existing SSH account. It needs root access or passwordless sudo. The recipe starts a temporary NixOS installer in RAM. Ubuntu does not need Nix installed. |
-| Empty VM, inaccessible OS, or kexec unavailable      | Boot a NixOS installer ISO in the VM, or a NixOS USB on the laptop. Choose UEFI mode and connect it to the network.                                                |
-| Already running the live NixOS installer             | Use its SSH account. The recipe recognizes the installer and proceeds directly to disk setup.                                                                      |
+| Empty VM, inaccessible OS, or kexec unavailable | Boot a NixOS installer ISO in the VM, or a NixOS USB on the laptop. Choose UEFI mode and connect it to the network. |
+| Already running the live NixOS installer | Use its SSH account. The recipe recognizes the installer and proceeds directly to disk setup. |
 
 Open the laptop or VM console now. You’ll need it to unlock the encrypted disk on first boot and after subsequent reboots. If starting from Ubuntu on a laptop with Wi-Fi, the live USB path lets you establish networking in the installer before starting.
 
@@ -147,12 +147,11 @@ Proceed once you can identify the intended whole disk, authenticate and run sudo
 
 Each target has its own flake output. Keep the host configurations together in this checkout. For a reinstall, reuse the existing output after checking the drive identity.
 
-| Target                         | Set the host variable on the controller       | Disk and hardware                                                                                                      |
-| ------------------------------ | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| ThinkPad with unencrypted root | `host=tpx1-unencrypted`                       | Same physical SSD as the encrypted variant.                                                                            |
-| Encrypted ThinkPad             | `host=tpx1`                                   | `wwn-0x5002538d41d1f7ec` in the [hardware module](../modules/hosts/tpx1/hardware.nix).                                 |
-| Kamigawa desktop               | `host=kamigawa`                               | Samsung SSD 870 EVO 4 TB, `wwn-0x5002538f31b2732f` in the [host configuration](../modules/hosts/kamigawa/default.nix). |
-| New machine                    | `host=office-pc` (choose its actual hostname) | Add a host once using the steps below.                                                                                 |
+| Target | Set the host variable on the controller | Disk and hardware |
+| --- | --- | --- |
+| Encrypted ThinkPad | `host=tpx1` | `wwn-0x5002538d41d1f7ec` in the [hardware module](../modules/hosts/tpx1/hardware.nix). |
+| Kamigawa desktop | `host=kamigawa` | Samsung SSD 870 EVO 4 TB, `wwn-0x5002538f31b2732f` in the [host configuration](../modules/hosts/kamigawa/default.nix). |
+| New machine | `host=office-pc` (choose its actual hostname) | Add a host once using the steps below. |
 
 Set `host` once using the table. For a preconfigured host, proceed directly to the disk check below.
 
@@ -244,4 +243,4 @@ swapon --show
 hostname
 ```
 
-For `tpx1-unencrypted`, expect ext4 root and a swap partition. For the encrypted workstations, expect ext4 on the host's encrypted root mapping (`/dev/mapper/kamigawa-crypt` on Kamigawa and `/dev/mapper/tpx1-crypt` on the encrypted ThinkPad), active `/swapfile`, and the selected hostname. Restore the installed repository revision at `~/repos/github/pszponder/nixconfig` for manual updates. Run `just bootstrap` for dotfiles and `just switch` for normal updates.
+For the encrypted workstations, expect ext4 on the host's encrypted root mapping (`/dev/mapper/kamigawa-crypt` on Kamigawa and `/dev/mapper/tpx1-crypt` on the encrypted ThinkPad), active `/swapfile`, and the selected hostname. Restore the installed repository revision at `~/repos/github/pszponder/nixconfig` for manual updates. Run `just bootstrap` for dotfiles and `just switch` for normal updates.

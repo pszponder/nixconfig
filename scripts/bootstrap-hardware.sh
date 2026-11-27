@@ -2,8 +2,6 @@
 set -euo pipefail
 
 host=${1:?Usage: bootstrap-hardware.sh HOST}
-# Both ThinkPad layouts import the same physical hardware scan.
-[[ $host != tpx1-unencrypted ]] || host=tpx1
 destination="modules/hosts/$host/_hardware-configuration.nix"
 temporary=$(mktemp "${destination}.XXXXXX")
 trap 'rm -f -- "$temporary"' EXIT
