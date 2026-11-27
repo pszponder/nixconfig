@@ -19,12 +19,12 @@
       };
 
       environment.systemPackages = with pkgs; [
+        anomaly-hex
         discord
         flameshot
         ghostty
         google-chrome
         llmAgents.herdr-app
-        inputs.hex.packages.${system}.default
         libreoffice
         obsidian
         llmAgents.opencode2-desktop

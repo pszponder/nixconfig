@@ -15,7 +15,6 @@
 
     # Keep upstream's tested nixpkgs pin for compatibility and binary cache hits.
     llm-agents.url = "github:numtide/llm-agents.nix";
-    hex.url = "github:anomalyco/hex";
 
     pflakes = {
       url = "github:pszponder/pflakes";
