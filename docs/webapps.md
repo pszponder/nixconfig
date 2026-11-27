@@ -18,7 +18,7 @@ All icons come from [Dashboard Icons](https://github.com/homarr-labs/dashboard-i
 
 Nix downloads and verifies each PNG against its `iconHash` when building the launcher, and stores it in the Nix store. Icons are available immediately after activation, including offline. There is no background downloader or user icon cache to maintain.
 
-When adding an icon, get its hash using the revision in `iconBaseUrl`:
+Replace `<revision>` with the revision from `iconBaseUrl` and `<iconName>` with the icon filename without `.png`. Run the command to get its hash.
 
 ```sh
 nix store prefetch-file --json 'https://raw.githubusercontent.com/homarr-labs/dashboard-icons/<revision>/png/<iconName>.png'

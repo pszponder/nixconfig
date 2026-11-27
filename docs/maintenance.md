@@ -4,7 +4,7 @@
 
 ## Building and switching
 
-Run these standard Nix commands from this checkout, selecting a host explicitly:
+Run these standard Nix commands from this checkout, selecting a host explicitly. The examples use the encrypted ThinkPad, `tpx1`.
 
 ```sh
 nix build .#nixosConfigurations.tpx1.config.system.build.toplevel
@@ -73,45 +73,50 @@ journalctl -u fprintd.service -b
 
 `fprintd` starts on demand over D-Bus; being inactive when idle is normal. See the [fprintd manual](https://man.archlinux.org/man/fprintd.1.en) and [NixOS GDM integration](https://github.com/NixOS/nixpkgs/blob/d5cc6833999746cffdfe0598f7bc801a57b887a9/nixos/modules/services/display-managers/gdm.nix).
 
-## Future SSH deployments
+## Update an existing NixOS host over SSH
 
-The generic recipe is ready for future hosts; this checkout currently declares only `tpx1`. Its interface is `just deploy HOST TARGET [ACTION] [BUILD_HOST]`. `HOST` selects `nixosConfigurations.HOST`; `TARGET` is a required SSH destination, such as `piotr@server1` or an SSH configuration alias. The default action is `switch` and the default build location is the local machine. All actions ask for confirmation.
-
-After declaring a real host, use commands like these, replacing the example names:
-
-```sh
-# Build locally and preview changes on the target
-just deploy server1 piotr@server1 dry-activate
-
-# Activate temporarily, then reconnect and check the services
-just deploy server1 piotr@server1 test
-
-# Activate and make the configuration the boot default
-just deploy server1 piotr@server1
-
-# Build on the target instead, useful for another architecture
-just deploy server1 piotr@server1 switch piotr@server1
-
-# Build on a separate compatible builder
-just deploy server1 piotr@server1 switch piotr@builder
-
-# Make the new configuration the boot default without activating it now
-just deploy server1 piotr@server1 boot
-```
-
-The recipe runs as your regular local user so SSH can use your keys, agent, and aliases. It uses `--elevate sudo --ask-elevate-password` for remote activation, prompting locally for the target user's sudo password. These flags are supported by the installed `nixos-rebuild`; older versions may use `--sudo --ask-sudo-password`. The article's `--use-remote-sudo` flag is deprecated. For passwordless automation, use the underlying command with the elevation and authentication settings appropriate to the deployment account.
+Use this recipe to rebuild an installed NixOS host using its existing filesystems. For a fresh disk layout, follow the [clean installation guide](install.md). The deployment command is `just deploy HOST TARGET [ACTION] [BUILD_HOST]`. `HOST` selects `nixosConfigurations.HOST`; `TARGET` is a required SSH destination, such as `piotr@server1` or an SSH configuration alias. The default action is `switch` and the default build location is the local machine. All actions ask for confirmation.
 
 Before the first deployment:
 
+- On the controller, open the repository checkout with Nix flakes enabled and Git, Just, and `nixos-rebuild` available. Use `nix-shell -p git just nixos-rebuild` if you need those tools.
 - Add a host composition with its own hardware configuration, platform, boot settings, and `system.stateVersion`. Select server features explicitly.
 - Enable `services.openssh`, declare the deployment user's `openssh.authorizedKeys.keys`, and provide sudo access. Verify the SSH host key and test login first.
 - Ensure the build machine can build the target platform. `--target-host` alone does not configure cross-compilation. A remote builder needs SSH access and working Nix builds; store transfers may also require configured signing trust or an appropriately trusted Nix user.
 - Stage newly created Nix files so Git-backed flakes can see them. Review and commit the lockfile used for deployment. The recipe does not update inputs or synchronize a checkout on the target.
 - For centrally managed servers, keep automatic GC but configure upgrades separately: importing the current `nixMaintenance` module enables both. Prefer centrally deploying a reviewed lockfile over each server independently updating `nixpkgs`.
 
-Remote `test` preserves the old boot default but cannot restore SSH automatically. Consider [deploy-rs](https://github.com/serokell/deploy-rs) when deployments need connectivity confirmation and automatic rollback. Keep a console or other recovery path available for boot and network changes.
+Replace `server1` and `piotr@server1` with your host name and SSH destination. Run these commands from the controller.
 
-For initial installation, consider [nixos-anywhere](https://nix-community.github.io/nixos-anywhere/) with disko when repeatable remote disk provisioning is needed. Installation can erase target disks and should remain a separate operation from this deployment recipe.
+1. Preview the changes.
+
+   ```sh
+   just deploy server1 piotr@server1 dry-activate
+   ```
+
+2. Activate temporarily.
+
+   ```sh
+   just deploy server1 piotr@server1 test
+   ```
+
+3. Open a new SSH session to the target and check the services you changed. If they work, make the configuration the boot default from the controller.
+
+   ```sh
+   just deploy server1 piotr@server1
+   ```
+
+For other deployment modes, choose the command that fits your setup.
+
+| Purpose | Command |
+| --- | --- |
+| Build on the target | `just deploy server1 piotr@server1 switch piotr@server1` |
+| Build on a separate compatible machine | `just deploy server1 piotr@server1 switch piotr@builder` |
+| Set the boot default for the next reboot | `just deploy server1 piotr@server1 boot` |
+
+The recipe runs as your regular local user so SSH can use your keys, agent, and aliases. It uses `--elevate sudo --ask-elevate-password` for remote activation, prompting locally for the target user's sudo password. These flags are supported by the installed `nixos-rebuild`; older versions may use `--sudo --ask-sudo-password`. The article's `--use-remote-sudo` flag is deprecated. For passwordless automation, use the underlying command with the elevation and authentication settings appropriate to the deployment account.
+
+Remote `test` preserves the old boot default but cannot restore SSH automatically. Consider [deploy-rs](https://github.com/serokell/deploy-rs) when deployments need connectivity confirmation and automatic rollback. Keep a console or other recovery path available for boot and network changes.
 
 See the upstream [nixos-rebuild command reference](https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/ni/nixos-rebuild-ng/nixos-rebuild.8.scd) for build-host, target-host, and elevation options.
 
@@ -137,9 +142,7 @@ Inspect the scheduled cleanup with `systemctl status nix-gc.timer` and `journalc
 
 ## Automatic upgrades
 
-The standard NixOS `system.autoUpgrade` service runs Sundays at 18:00 with up to 45 minutes of random delay. It updates the `nixpkgs` flake input, rebuilds, and activates without automatic reboot. Other inputs remain pinned. The job writes `flake.lock` in the configured checkout without committing or pushing it; review and commit that diff afterward. If the build fails, the lockfile may still contain the updated pin. Cleanup runs separately through `nix-gc.service`.
-
-Inspect upgrades with `systemctl status nixos-upgrade.timer` and `journalctl -u nixos-upgrade.service`.
+Unattended system upgrades are disabled. Run `just up HOST` from the checkout to update the flake inputs and activate the new system. Weekly garbage collection runs independently.
 
 ## Resources / References
 

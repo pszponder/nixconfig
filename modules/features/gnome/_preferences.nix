@@ -2,11 +2,11 @@
   xdg.mime = {
     enable = true;
     defaultApplications = {
-      "text/html" = "firefox.desktop";
-      "x-scheme-handler/http" = "firefox.desktop";
-      "x-scheme-handler/https" = "firefox.desktop";
-      "x-scheme-handler/about" = "firefox.desktop";
-      "x-scheme-handler/unknown" = "firefox.desktop";
+      "text/html" = "helium.desktop";
+      "x-scheme-handler/http" = "helium.desktop";
+      "x-scheme-handler/https" = "helium.desktop";
+      "x-scheme-handler/about" = "helium.desktop";
+      "x-scheme-handler/unknown" = "helium.desktop";
     };
   };
 
@@ -42,7 +42,7 @@
           always-show-log-out = true;
           favorite-apps = [
             "org.gnome.Nautilus.desktop"
-            "firefox.desktop"
+            "helium.desktop"
             "com.mitchellh.ghostty.desktop"
             "code.desktop"
             # "dev.zed.Zed.desktop"

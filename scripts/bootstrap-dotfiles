@@ -13,6 +13,12 @@ for tool in git just stow; do
 	fi
 done
 
+with_ssh=false
+if [[ ${1:-} == --with-ssh ]]; then
+	with_ssh=true
+	shift
+fi
+
 repo=${1:-"$HOME/repos/github/pszponder/dotfiles"}
 url=https://github.com/pszponder/dotfiles.git
 
@@ -42,3 +48,6 @@ fi
 
 cd -- "$repo"
 just stow
+if "$with_ssh"; then
+	just bootstrap-ssh
+fi

@@ -34,6 +34,26 @@
         "type": "github"
       }
     },
+    "disko": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795168368,
+        "narHash": "sha256-D35n2Q2v1KrlF9LS/pFl8Z3EBMJW6qvPw5q4HMbXXLg=",
+        "owner": "nix-community",
+        "repo": "disko",
+        "rev": "44761d4f745b95e037458a0e57133c5700c8e320",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "disko",
+        "type": "github"
+      }
+    },
     "flake-parts": {
       "inputs": {
         "nixpkgs-lib": "nixpkgs-lib"
@@ -201,11 +221,11 @@
         "zen-browser": "zen-browser"
       },
       "locked": {
-        "lastModified": 1795566745,
-        "narHash": "sha256-mfY8yR8Kk35T3SQwrSjUfdTWEgxa2gN2aqcBlbkK1VM=",
+        "lastModified": 1795753662,
+        "narHash": "sha256-cr6ww0NGvSSj47VTj+i+XyLr/V3W8JM2LbjpBbDuOsU=",
         "owner": "pszponder",
         "repo": "pflakes",
-        "rev": "efc9499aed36b611210420b4b133b210f144d644",
+        "rev": "2567fee15eaa84f783d35e626e551c651866c38f",
         "type": "github"
       },
       "original": {
@@ -216,6 +236,7 @@
     },
     "root": {
       "inputs": {
+        "disko": "disko",
         "flake-parts": "flake-parts",
         "import-tree": "import-tree",
         "llm-agents": "llm-agents",

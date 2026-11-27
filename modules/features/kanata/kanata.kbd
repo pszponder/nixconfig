@@ -11,7 +11,7 @@
 ;; OS key code mappings
 ;; https://github.com/jtroo/kanata/blob/main/parser/src/keys/mod.rs
 
-;; Rebuild NixOS after editing this file: sudo nixos-rebuild switch --flake .#tpx1
+;; Rebuild NixOS after editing this file with just switch from the repository root.
 ;; Check the system service and logs:
 ;; systemctl status kanata-default
 ;; journalctl -u kanata-default -b

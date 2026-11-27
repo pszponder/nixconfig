@@ -1,5 +1,18 @@
 { inputs, ... }:
 {
+  flake.modules.nixos.commonPackages = { pkgs, ... }: {
+    environment.systemPackages = with pkgs; [
+      dnsutils
+      git
+      jq
+      less
+      openssh
+      ripgrep
+      util-linux
+      wget
+    ];
+  };
+
   flake.modules.nixos.basePackages =
     { pkgs, ... }:
     let
@@ -29,32 +42,24 @@
         delta
         devenv
         direnv
-        dnsutils
         eza
         fd
         fzf
         gawk
         gcc
         gh
-        git
         llmAgents.herdr
-        jq
         jujutsu
         just
         kanata
-        less
         nix-direnv
         nix-zsh-completions
         nixd
-        openssh
-        ripgrep
         starship
         stow
         tmux
         tree-sitter
-        util-linux
         vim
-        wget
         zoxide
         zsh-autosuggestions
         zsh-completions
