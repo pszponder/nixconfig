@@ -221,11 +221,11 @@
         "zen-browser": "zen-browser"
       },
       "locked": {
-        "lastModified": 1795566745,
-        "narHash": "sha256-mfY8yR8Kk35T3SQwrSjUfdTWEgxa2gN2aqcBlbkK1VM=",
+        "lastModified": 1795753662,
+        "narHash": "sha256-cr6ww0NGvSSj47VTj+i+XyLr/V3W8JM2LbjpBbDuOsU=",
         "owner": "pszponder",
         "repo": "pflakes",
-        "rev": "efc9499aed36b611210420b4b133b210f144d644",
+        "rev": "2567fee15eaa84f783d35e626e551c651866c38f",
         "type": "github"
       },
       "original": {
