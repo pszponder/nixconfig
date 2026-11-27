@@ -2,6 +2,10 @@
 {
   flake.modules.nixos.desktopPackages =
     { pkgs, ... }:
+    let
+      system = pkgs.stdenv.hostPlatform.system;
+      llmAgents = inputs.llm-agents.packages.${system};
+    in
     {
       imports = [
         inputs.pflakes.nixosModules.helium
@@ -19,9 +23,12 @@
         flameshot
         ghostty
         google-chrome
+        llmAgents.herdr-app
+        inputs.hex.packages.${system}.default
         libreoffice
         obsidian
-        t3code
+        llmAgents.opencode2-desktop
+        # t3code
         vscode
         wl-clipboard
         zed-editor

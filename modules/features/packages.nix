@@ -37,6 +37,7 @@
         bash-language-server
         bubblewrap
         clang-tools
+        llmAgents.claude-code
         cmake-language-server
         llmAgents.codex
         delta
@@ -49,12 +50,15 @@
         gcc
         gh
         llmAgents.herdr
+        llmAgents.herdr-core
         jujutsu
         just
         kanata
         nix-direnv
         nix-zsh-completions
         nixd
+        llmAgents.opencode2
+        llmAgents.pi
         starship
         stow
         tmux
