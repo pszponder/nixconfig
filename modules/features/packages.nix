@@ -59,6 +59,7 @@
         nixd
         llmAgents.opencode2
         llmAgents.pi
+        llmAgents.sandbox-runtime
         starship
         stow
         tmux

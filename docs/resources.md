@@ -83,3 +83,9 @@
 ## Related repositories
 
 - [dots repo](https://github.com/pszponder/dots)
+
+## AI/ML Resources
+
+### Sandboxing AI Agents
+- [NeuralNine - Sandboxing AI Agents w/ srt](https://www.youtube.com/watch?v=7ux8bMvu-Lc)
+-
