@@ -2,13 +2,23 @@
 
 ## Todos
 
+- [ ] Crete a host configuration for a new development server (we don't necessarily know the the hardware so do we create hardware-configuration.nix instead of relying on Disko?)
 - [ ] Port things I like about Omarchy to NixOS
+  - [ ] Quickshell configuration
+  - [ ] Auto-login w/ custom banner and encryption unlock
 - [ ] Configure fingerprint reader on thinkpad
 - [ ] [qutebrowser | qutebrowser](https://qutebrowser.org/)
   - [ ] [Boost Your Productivity with Qutebrowser (Keyboard‑First Browser) on Linux!](https://www.youtube.com/watch?v=_4CWJnCB3To)
 - [ ] What's the best way to symlink codex config without constantly committing it due to it's changing nature. I only want my customizations to the status lines to be tracked, not for example trusted repos
 - [ ] add custom nvim configurations
 - [ ] Figure out how to use disko and nixos-anywhere to make my configuration portable and easy to setup / reinstall
+- [ ] Figure out how to build [hex](https://github.com/anomalyco/hex) from pre-compiled binary, do we need to put this in pflakes?
+    - [ ] https://search.nixos.org/packages?channel=unstable&query=hex#show=anomaly-hex
+- [ ] Use AI to review my nixconfig, are there any simplifications that should be made
+- [ ] [Dreams of Autonomy - This homelab setup is my favorite one yet - w/ Disko and nixos-anywhere](https://www.youtube.com/watch?v=2yplBzPCghA)
+- [ ] [The Most Nix Way to Install NixOS - Disko in 6 Commands](https://www.youtube.com/watch?v=8SnzWKBpbQQ)
+- [ ] [Noctalia](https://noctalia.dev/)
+- [ ] [CosmicDE](https://wiki.nixos.org/wiki/COSMIC)
 
 ## Completed Todos
 
