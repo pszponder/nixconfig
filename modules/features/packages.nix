@@ -53,7 +53,6 @@
         llmAgents.herdr-core
         jujutsu
         just
-        kanata
         nix-direnv
         nix-zsh-completions
         nixd
