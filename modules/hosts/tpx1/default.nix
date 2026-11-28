@@ -3,7 +3,8 @@
   flake.nixosConfigurations.tpx1 = inputs.nixpkgs.lib.nixosSystem {
     modules = with self.modules.nixos; [
       workstation
-      gnome
+      # gnome
+      cosmic
       tpx1Hardware
       kanata
       fingerprint
