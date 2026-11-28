@@ -8,7 +8,7 @@ A multi-host dendritic NixOS configuration, inspired by [Renato Garcia's simple 
 - `modules/features/common.nix`: shared NixOS settings and Nerd Fonts.
 - `modules/features/packages.nix`: shared admin tools and workstation packages.
 - `modules/hosts/`: named host configurations, disk selection, hardware drivers, and host-specific features.
-- `modules/install.nix`: installer package and VM installation checks. Encrypted workstations import the shared [_encrypted-disk.nix](modules/hosts/_encrypted-disk.nix) layout and set disk identifiers in their host directories. The [shared workstation profile](modules/features/common-workstation.nix) supplies packages and maintenance settings for all three workstations. Each host selects GNOME explicitly.
+- `modules/install.nix`: installer package and VM installation checks. Encrypted workstations import the shared [_encrypted-disk.nix](modules/hosts/_encrypted-disk.nix) layout and set disk identifiers in their host directories. The [shared workstation profile](modules/features/workstation.nix) supplies packages and maintenance settings for both workstations. Each host selects GNOME explicitly.
 - `modules/users/piotr/default.nix`: user account.
 - `modules/features/`: GNOME, desktop packages, Docker, and Kanata.
 

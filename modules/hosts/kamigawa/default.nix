@@ -5,7 +5,7 @@ in
 {
   flake.nixosConfigurations.${hostName} = inputs.nixpkgs.lib.nixosSystem {
     modules = with self.modules.nixos; [
-      workstationCommon
+      workstation
       gnome
       inputs.disko.nixosModules.disko
       ./_disk.nix

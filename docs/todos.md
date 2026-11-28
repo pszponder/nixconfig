@@ -7,13 +7,13 @@
 - [ ] [qutebrowser | qutebrowser](https://qutebrowser.org/)
   - [ ] [Boost Your Productivity with Qutebrowser (Keyboard‑First Browser) on Linux!](https://www.youtube.com/watch?v=_4CWJnCB3To)
 - [ ] What's the best way to symlink codex config without constantly committing it due to it's changing nature. I only want my customizations to the status lines to be tracked, not for example trusted repos
-- [ ] add tmux
-- [ ] add herdr
 - [ ] add custom nvim configurations
 - [ ] Figure out how to use disko and nixos-anywhere to make my configuration portable and easy to setup / reinstall
 
 ## Completed Todos
 
+- [x] add tmux
+- [x] add herdr
 - [x] Use ai to generate names for pc (ex. mtg planes like Kamigawa)
 - [x] Have AI review repos which packages / convert apps to Flakes (ex. like helium from deb) and create a skill using the process
   - [x] [How I Packaged a .deb File (Helium Browser) for NixOS with Flakes | by oxcl | Medium](https://medium.com/@oxcl/how-i-packaged-a-deb-file-for-nixos-with-flakes-ed4e4eb7dbac)
